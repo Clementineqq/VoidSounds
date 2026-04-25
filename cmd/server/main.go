@@ -8,17 +8,19 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 
 	"voidsounds/internal/components"
+	"voidsounds/internal/repository"
 	"voidsounds/internal/service"
 )
 
 func main() {
+	// Инициализация слоёв
+	eventRepo := repository.NewEventRepository()
+	eventService := service.NewEventService(eventRepo)
+
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-
-	// Инициализация сервисов
-	eventService := service.NewEventService()
 
 	// Роуты
 	r.Get("/", homeHandler)
@@ -38,7 +40,12 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func eventsHandler(w http.ResponseWriter, r *http.Request, svc *service.EventService) {
-	events := svc.GetAllEvents()
+	events, err := svc.GetAllEvents()
+	if err != nil {
+		http.Error(w, "Ошибка получения мероприятий", http.StatusInternalServerError)
+		return
+	}
+
 	component := components.Events(events)
 	if err := component.Render(r.Context(), w); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
