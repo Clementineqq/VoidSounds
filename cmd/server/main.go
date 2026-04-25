@@ -18,11 +18,10 @@ func main() {
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	component := components.Home()
 	if err := component.Render(r.Context(), w); err != nil {
-		http.Error(w, "Ошибка рендеринга: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func pingHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-	w.Write([]byte(`<p class="text-emerald-400 mt-6 text-lg">робит.</p>`))
+	w.Write([]byte(`<p class="text-emerald-400 mt-8">✅ Всё работает! HTMX активен.</p>`))
 }
