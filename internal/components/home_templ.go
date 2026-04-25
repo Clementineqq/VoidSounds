@@ -29,7 +29,25 @@ func Home() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"ru\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>VoidSounds</title><script src=\"https://unpkg.com/htmx.org@2/dist/htmx.min.js\"></script><!-- Пока используем Tailwind через CDN для простоты --><script src=\"https://cdn.tailwindcss.com\"></script></head><body class=\"bg-zinc-950 text-white min-h-screen\"><div class=\"flex items-center justify-center min-h-screen\"><div class=\"text-center\"><h1 class=\"text-7xl font-bold tracking-tighter mb-4 bg-gradient-to-r from-violet-400 to-fuchsia-500 bg-clip-text text-transparent\">VoidSounds</h1><p class=\"text-xl text-zinc-400 mb-10\">Платформа для организации музыкальных мероприятий</p><button class=\"bg-violet-600 hover:bg-violet-700 transition px-10 py-4 rounded-2xl text-lg font-medium\" hx-get=\"/ping\" hx-swap=\"afterend\">Проверить HTMX</button></div></div></body></html>")
+		templ_7745c5c3_Var2 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+			if !templ_7745c5c3_IsBuffer {
+				defer func() {
+					templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err == nil {
+						templ_7745c5c3_Err = templ_7745c5c3_BufErr
+					}
+				}()
+			}
+			ctx = templ.InitializeContext(ctx)
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"min-h-screen flex items-center justify-center\"><div class=\"text-center px-6\"><h1 class=\"text-7xl font-bold tracking-tighter mb-6 bg-gradient-to-r from-violet-400 via-fuchsia-500 to-pink-500 bg-clip-text text-transparent\">VoidSounds</h1><p class=\"text-2xl text-zinc-400 mb-12 max-w-md mx-auto\">блаблабла музыка</p><div class=\"flex flex-col sm:flex-row gap-4 justify-center\"><button class=\"bg-violet-600 hover:bg-violet-700 px-8 py-4 rounded-2xl text-lg font-semibold transition-all active:scale-95\" hx-get=\"/events\" hx-swap=\"innerHTML\" hx-target=\"#content\">Смотреть мероприятия</button> <a href=\"/create-event\" class=\"border border-zinc-700 hover:border-zinc-400 px-8 py-4 rounded-2xl text-lg font-medium transition-all\">Стать организатором</a></div></div></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			return nil
+		})
+		templ_7745c5c3_Err = Layout("Главная").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
