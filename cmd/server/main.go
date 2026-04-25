@@ -13,15 +13,13 @@ import (
 func main() {
 	r := chi.NewRouter()
 
-	// Middleware
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	// Роуты
+	// Основные роуты
 	r.Get("/", homeHandler)
-	r.Get("/ping", pingHandler)
 
-	log.Println("http://localhost:8080")
+	log.Println("VoidSounds запущен на http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
 
@@ -30,9 +28,4 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	if err := component.Render(r.Context(), w); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-}
-
-func pingHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-	w.Write([]byte(`<p class="text-emerald-400 mt-8 text-lg"> HTMX и chi роутер воркают</p>`))
 }
