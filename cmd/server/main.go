@@ -4,15 +4,25 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+
 	"voidsounds/internal/components"
 )
 
 func main() {
-	http.HandleFunc("/", homeHandler)
-	http.HandleFunc("/ping", pingHandler)
+	r := chi.NewRouter()
 
-	log.Println("🚀 VoidSounds запущен на http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	// Middleware
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+
+	// Роуты
+	r.Get("/", homeHandler)
+	r.Get("/ping", pingHandler)
+
+	log.Println("http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -23,5 +33,6 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func pingHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(`<p class="text-emerald-400 mt-8">✅ Всё работает! HTMX активен.</p>`))
+	w.Header().Set("Content-Type", "text/html")
+	w.Write([]byte(`<p class="text-emerald-400 mt-8 text-lg"> HTMX и chi роутер воркают</p>`))
 }

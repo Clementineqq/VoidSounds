@@ -2,26 +2,27 @@ package components
 
 templ Home() {
 	@Layout("Главная") {
-		<div class="min-h-screen flex items-center justify-center">
-			<div class="text-center px-6">
-				<h1 class="text-7xl font-bold tracking-tighter mb-6 bg-gradient-to-r from-violet-400 via-fuchsia-500 to-pink-500 bg-clip-text text-transparent">
+		<div class="min-h-screen flex items-center justify-center px-6">
+			<div class="text-center max-w-2xl mx-auto">
+				<h1 class="text-7xl font-bold tracking-tighter mb-6 bg-gradient-to-r from-violet-400 to-fuchsia-500 bg-clip-text text-transparent">
 					VoidSounds
 				</h1>
-				<p class="text-2xl text-zinc-400 mb-12 max-w-md mx-auto">
-					блаблабла музыка
+				<p class="text-2xl text-zinc-400 mb-12">
+					блабла музыка
 				</p>
-				
+
 				<div class="flex flex-col sm:flex-row gap-4 justify-center">
 					<button 
-						class="bg-violet-600 hover:bg-violet-700 px-8 py-4 rounded-2xl text-lg font-semibold transition-all active:scale-95"
+						class="bg-violet-600 hover:bg-violet-700 px-10 py-5 rounded-2xl text-lg font-semibold transition-all"
 						hx-get="/events"
-						hx-swap="innerHTML"
-						hx-target="#content">
+						hx-target="#main-content"
+						hx-swap="innerHTML">
 						Смотреть мероприятия
 					</button>
-					<a href="/create-event" 
-					   class="border border-zinc-700 hover:border-zinc-400 px-8 py-4 rounded-2xl text-lg font-medium transition-all">
-						Стать организатором
+					
+					<a href="#" 
+					   class="border border-zinc-700 hover:border-zinc-400 px-10 py-5 rounded-2xl text-lg font-medium transition-all">
+						Для организаторов
 					</a>
 				</div>
 			</div>
