@@ -42,7 +42,7 @@ func Layout(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " - VoidSounds</title><script src=\"https://unpkg.com/htmx.org@2/dist/htmx.min.js\"></script><script src=\"https://cdn.tailwindcss.com\"></script><script>\r\n\t\t\ttailwind.config = {\r\n\t\t\t\tcontent: [],\r\n\t\t\t\ttheme: {\r\n\t\t\t\t\textend: {}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t</script></head><body class=\"bg-zinc-950 text-zinc-100\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " — VoidSounds</title><script src=\"https://unpkg.com/htmx.org@2/dist/htmx.min.js\"></script><script src=\"https://cdn.tailwindcss.com\"></script><style>\r\n\t\t\t.line-clamp-3 {\r\n\t\t\t\tdisplay: -webkit-box;\r\n\t\t\t\t-webkit-line-clamp: 3;\r\n\t\t\t\t-webkit-box-orient: vertical;\r\n\t\t\t\toverflow: hidden;\r\n\t\t\t}\r\n\t\t</style></head><body class=\"bg-zinc-950 text-zinc-100\"><!-- Navbar --><nav class=\"border-b border-zinc-800 bg-zinc-900\"><div class=\"max-w-6xl mx-auto px-6 py-5 flex items-center justify-between\"><div class=\"flex items-center gap-8\"><a href=\"/\" class=\"text-2xl font-bold tracking-tighter text-white\">VoidSounds</a><div class=\"hidden md:flex items-center gap-6 text-sm\"><a href=\"/events\" class=\"hover:text-violet-400 transition\">Мероприятия</a> <a href=\"#\" class=\"hover:text-violet-400 transition\">Артисты</a> <a href=\"#\" class=\"hover:text-violet-400 transition\">Для организаторов</a></div></div><div class=\"flex items-center gap-4\"><button class=\"px-5 py-2 text-sm font-medium hover:text-violet-400 transition\">Войти</button> <button class=\"bg-violet-600 hover:bg-violet-700 px-5 py-2 rounded-xl text-sm font-medium transition\">Регистрация</button></div></div></nav><!-- Основной контент --><main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -50,7 +50,7 @@ func Layout(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</main></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
