@@ -8,11 +8,18 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 
 	"voidsounds/internal/components"
+	"voidsounds/internal/config"
 	"voidsounds/internal/repository"
 	"voidsounds/internal/service"
 )
 
 func main() {
+	// Загрузка конфигурации
+	cfg := config.Load()
+
+	// Инициализация БД
+	repository.InitDB(cfg)
+
 	// Инициализация слоёв
 	eventRepo := repository.NewEventRepository()
 	eventService := service.NewEventService(eventRepo)
@@ -29,7 +36,7 @@ func main() {
 	})
 
 	log.Println("VoidSounds запущен на http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(":"+cfg.ServerPort, r))
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
