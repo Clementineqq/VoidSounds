@@ -14,13 +14,10 @@ import (
 )
 
 func main() {
-	// Загрузка конфигурации
 	cfg := config.Load()
 
-	// Инициализация БД
 	repository.InitDB(cfg)
 
-	// Инициализация слоёв
 	eventRepo := repository.NewEventRepository()
 	eventService := service.NewEventService(eventRepo)
 
@@ -29,7 +26,6 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	// Роуты
 	r.Get("/", homeHandler)
 	r.Get("/events", func(w http.ResponseWriter, r *http.Request) {
 		eventsHandler(w, r, eventService)
@@ -49,6 +45,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 func eventsHandler(w http.ResponseWriter, r *http.Request, svc *service.EventService) {
 	events, err := svc.GetAllEvents()
 	if err != nil {
+		log.Printf("Ошибка получения мероприятий: %v", err)
 		http.Error(w, "Ошибка получения мероприятий", http.StatusInternalServerError)
 		return
 	}

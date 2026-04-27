@@ -19,8 +19,18 @@ func InitDB(cfg *config.Config) {
 	var err error
 	DB, err = sqlx.Connect("postgres", connStr)
 	if err != nil {
-		log.Fatalf("Не удалось подключиться к PostgreSQL: %v", err)
+		log.Printf("Ошибка подключения к PostgreSQL: %v", err)
+		log.Println("Проверьте, что контейнер PostgreSQL запущен (docker compose up -d postgres)")
+		DB = nil
+		return
 	}
 
-	log.Println("Успешно подключились к PostgreSQL")
+	// Проверка соединения
+	if err = DB.Ping(); err != nil {
+		log.Printf("Ошибка Ping к PostgreSQL: %v", err)
+		DB = nil
+		return
+	}
+
+	log.Println("✅ Успешно подключились к PostgreSQL")
 }
