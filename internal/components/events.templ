@@ -9,44 +9,69 @@ templ Events(events domain.Events) {
 			
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 				for _, event := range events {
-					<div class="bg-zinc-900 rounded-3xl overflow-hidden border border-zinc-800 hover:border-violet-500 transition">
-						<div class="h-48 bg-zinc-800 flex items-center justify-center">
-							<span class="text-zinc-500">Постер</span>
+					<div class="bg-zinc-900 rounded-3xl overflow-hidden border border-zinc-800 hover:border-violet-500 transition-all duration-300">
+						<!-- Постер -->
+						<div class="h-48 bg-zinc-800 flex items-center justify-center relative">
+							<span class="text-zinc-500 text-sm">Постер мероприятия</span>
+							if event.PosterURL != "" {
+								<img src={ event.PosterURL } class="w-full h-full object-cover" alt={ event.Title }>
+							}
 						</div>
+
 						<div class="p-6">
-							<div class="flex justify-between items-start mb-3">
-								<h3 class="text-xl font-semibold">{ event.Title }</h3>
-								<span class="text-emerald-400 text-sm font-medium">{ event.Genre }</span>
+							<!-- Заголовок и статус -->
+							<div class="flex justify-between items-start mb-4">
+								<h3 class="text-xl font-semibold leading-tight pr-2">{ event.Title }</h3>
+								if event.Status == "published" {
+									<span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-medium rounded-full">
+										Активно
+									</span>
+								}
 							</div>
-							
-							<p class="text-zinc-400 text-sm mb-4 line-clamp-2">
+
+							<!-- Описание -->
+							<p class="text-zinc-400 text-sm mb-5 line-clamp-3">
 								{ event.Description }
 							</p>
-							
-							<div class="space-y-2 text-sm">
+
+							<!-- Дата и место -->
+							<div class="space-y-2 text-sm text-zinc-400 mb-6">
 								<div class="flex items-center gap-2">
 									<span>📅</span>
-									<span>{ event.Date.Format("02.01.2006 в 15:04") }</span>
+									<span>{ event.Date.Format("02.01.2006 • 15:04") }</span>
 								</div>
 								<div class="flex items-center gap-2">
 									<span>📍</span>
-									<span>{ event.Location }</span>
+									if event.Address != "" {
+										<span>{ event.Address }</span>
+									} else {
+										<span>Место не указано</span>
+									}
 								</div>
 							</div>
 
-							<div class="mt-6 flex justify-between items-center">
+							<!-- Цена и кнопка -->
+							<div class="flex justify-between items-end">
 								<div>
-									<span class="text-2xl font-bold">{ event.Price }</span>
-									<span class="text-zinc-500"> ₽</span>
+									<span class="text-3xl font-bold">{ event.Price }</span>
+									<span class="text-zinc-500 text-lg"> ₽</span>
 								</div>
+								
 								<button 
-									class="bg-violet-600 hover:bg-violet-700 px-6 py-3 rounded-2xl text-sm font-medium transition"
+									class="bg-violet-600 hover:bg-violet-700 px-7 py-3.5 rounded-2xl text-sm font-medium transition-all active:scale-95"
 									hx-get={ "/event/" + string(event.ID) }
-									hx-target="#main-content">
+									hx-target="#main-content"
+									hx-swap="innerHTML">
 									Подробнее
 								</button>
 							</div>
 						</div>
+					</div>
+				}
+
+				if len(events) == 0 {
+					<div class="col-span-3 text-center py-20">
+						<p class="text-zinc-400 text-lg">Пока нет предстоящих мероприятий</p>
 					</div>
 				}
 			</div>

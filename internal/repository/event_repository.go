@@ -9,7 +9,8 @@ import (
 type EventRepository interface {
 	GetAll() (domain.Events, error)
 	GetByID(id int) (*domain.Event, error)
-	// Create, Update, Delete добавим позже
+	Create(event *domain.Event) error
+	// GetByGenre, GetByCity добавим позже
 }
 
 type eventRepository struct{}
@@ -24,9 +25,12 @@ func (r *eventRepository) GetAll() (domain.Events, error) {
 	}
 
 	query := `
-		SELECT id, title, description, date, location, genre, price, available, 
-		       organizer_id, created_at 
+		SELECT 
+			id, title, description, date, city_id, address, 
+			price, available, poster_url, organizer_id, 
+			status, created_at, updated_at
 		FROM events 
+		WHERE status = 'published'
 		ORDER BY date ASC`
 
 	var events domain.Events
@@ -39,7 +43,13 @@ func (r *eventRepository) GetAll() (domain.Events, error) {
 }
 
 func (r *eventRepository) GetByID(id int) (*domain.Event, error) {
-	return nil, nil // пока не реализуем
+	// Пока оставим заглушкой
+	return nil, nil
+}
+
+func (r *eventRepository) Create(event *domain.Event) error {
+	// Реализуем позже при создании формы
+	return nil
 }
 
 func getMockEvents() domain.Events {
@@ -49,10 +59,10 @@ func getMockEvents() domain.Events {
 			Title:       "Шум и Выходки в баре «Подвал»",
 			Description: "Сольный концерт группы Шум и Выходки.",
 			Date:        time.Date(2026, 5, 15, 20, 0, 0, 0, time.Local),
-			Location:    "Бар «Подвал», Москва",
-			Genre:       "Инди-рок",
+			Address:     "Бар «Подвал», Москва",
 			Price:       1500,
 			Available:   87,
+			Status:      "published",
 		},
 	}
 }
