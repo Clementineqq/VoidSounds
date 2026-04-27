@@ -11,7 +11,7 @@ type Event struct {
 	Address     string    `db:"address" json:"address"`
 	Price       int       `db:"price" json:"price"`
 	Available   int       `db:"available" json:"available"`
-	PosterURL   string    `db:"poster_url" json:"poster_url"`
+	PosterURL   *string   `db:"poster_url" json:"poster_url"` // ← изменили на *string
 	OrganizerID int       `db:"organizer_id" json:"organizer_id"`
 	Status      string    `db:"status" json:"status"`
 	CreatedAt   time.Time `db:"created_at" json:"created_at"`

@@ -19,6 +19,7 @@ func main() {
 	migrationFiles := []string{
 		"migrations/002_create_full_schema.sql",
 		"migrations/003_seed_initial_data.sql",
+		"migrations/004_seed_test_events.sql",
 	}
 
 	for _, file := range migrationFiles {
