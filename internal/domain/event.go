@@ -7,13 +7,22 @@ type Event struct {
 	Title       string    `db:"title" json:"title"`
 	Description string    `db:"description" json:"description"`
 	Date        time.Time `db:"date" json:"date"`
-	Location    string    `db:"location" json:"location"`
-	Genre       string    `db:"genre" json:"genre"`
+	CityID      *int      `db:"city_id" json:"city_id"`
+	Address     string    `db:"address" json:"address"`
 	Price       int       `db:"price" json:"price"`
 	Available   int       `db:"available" json:"available"`
-	OrganizerID *int      `db:"organizer_id" json:"organizer_id"`
+	PosterURL   string    `db:"poster_url" json:"poster_url"`
+	OrganizerID int       `db:"organizer_id" json:"organizer_id"`
+	Status      string    `db:"status" json:"status"`
 	CreatedAt   time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
 }
 
 type Events []Event
+
+// Вспомогательная структура для жанров
+type Genre struct {
+	ID   int    `db:"id" json:"id"`
+	Name string `db:"name" json:"name"`
+	Slug string `db:"slug" json:"slug"`
+}
