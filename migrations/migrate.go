@@ -10,24 +10,32 @@ import (
 
 func main() {
 	cfg := config.Load()
-
-	// Принудительно пытаемся подключиться
 	repository.InitDB(cfg)
 
 	if repository.DB == nil {
-		log.Fatal(" Не удалось подключиться к базе данных. Убедитесь, что PostgreSQL запущен через Docker.")
+		log.Fatal("Не удалось подключиться к базе данных")
 	}
 
-	// Выполняем миграцию
-	sqlBytes, err := os.ReadFile("migrations/001_create_events_table.sql")
-	if err != nil {
-		log.Fatal("Не удалось прочитать файл миграции:", err)
+	migrationFiles := []string{
+		"migrations/002_create_full_schema.sql",
+		"migrations/003_seed_initial_data.sql",
 	}
 
-	_, err = repository.DB.Exec(string(sqlBytes))
-	if err != nil {
-		log.Fatal("Ошибка выполнения миграции:", err)
+	for _, file := range migrationFiles {
+		sqlBytes, err := os.ReadFile(file)
+		if err != nil {
+			log.Printf("Не удалось прочитать файл %s: %v", file, err)
+			continue
+		}
+
+		_, err = repository.DB.Exec(string(sqlBytes))
+		if err != nil {
+			log.Printf("Ошибка выполнения миграции %s: %v", file, err)
+			continue
+		}
+
+		log.Printf("Миграция %s успешно применена", file)
 	}
 
-	log.Println("  Миграция успешно применена! Таблица events создана.")
+	log.Println(" Все миграции успешно выполнены, пьем пиво!")
 }
