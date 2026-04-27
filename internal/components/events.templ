@@ -1,6 +1,9 @@
 package components
 
-import "voidsounds/internal/domain"
+import (
+	"voidsounds/internal/domain"
+	"strconv"
+)
 
 templ Events(events domain.Events) {
 	@Layout("Мероприятия") {
@@ -10,11 +13,16 @@ templ Events(events domain.Events) {
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 				for _, event := range events {
 					<div class="bg-zinc-900 rounded-3xl overflow-hidden border border-zinc-800 hover:border-violet-500 transition-all duration-300">
+						
 						<!-- Постер -->
-						<div class="h-48 bg-zinc-800 flex items-center justify-center relative">
-							<span class="text-zinc-500 text-sm">Постер мероприятия</span>
-							if event.PosterURL != "" {
-								<img src={ event.PosterURL } class="w-full h-full object-cover" alt={ event.Title }>
+						<div class="h-48 bg-zinc-800 flex items-center justify-center relative overflow-hidden">
+							<span class="text-zinc-500 text-sm z-10">Постер мероприятия</span>
+							
+							if event.PosterURL != nil {
+								<img 
+									src={ *event.PosterURL } 
+									class="w-full h-full object-cover absolute inset-0" 
+									alt={ event.Title } />
 							}
 						</div>
 
@@ -22,6 +30,7 @@ templ Events(events domain.Events) {
 							<!-- Заголовок и статус -->
 							<div class="flex justify-between items-start mb-4">
 								<h3 class="text-xl font-semibold leading-tight pr-2">{ event.Title }</h3>
+								
 								if event.Status == "published" {
 									<span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-medium rounded-full">
 										Активно
@@ -40,8 +49,10 @@ templ Events(events domain.Events) {
 									<span>📅</span>
 									<span>{ event.Date.Format("02.01.2006 • 15:04") }</span>
 								</div>
+								
 								<div class="flex items-center gap-2">
 									<span>📍</span>
+									
 									if event.Address != "" {
 										<span>{ event.Address }</span>
 									} else {
@@ -59,7 +70,7 @@ templ Events(events domain.Events) {
 								
 								<button 
 									class="bg-violet-600 hover:bg-violet-700 px-7 py-3.5 rounded-2xl text-sm font-medium transition-all active:scale-95"
-									hx-get={ "/event/" + string(event.ID) }
+									hx-get={ "/event/" + strconv.Itoa(event.ID) }
 									hx-target="#main-content"
 									hx-swap="innerHTML">
 									Подробнее
