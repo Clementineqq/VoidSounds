@@ -1,13 +1,18 @@
 module voidsounds
 
-go 1.24.1
+go 1.25.0
 
 require (
 	github.com/a-h/templ v0.3.1001
 	github.com/go-chi/chi/v5 v5.2.5
 )
 
-require github.com/gosimple/unidecode v1.0.1 // indirect
+require (
+	github.com/gorilla/securecookie v1.1.2 // indirect
+	github.com/gorilla/sessions v1.4.0 // indirect
+	github.com/gosimple/unidecode v1.0.1 // indirect
+	golang.org/x/crypto v0.50.0 // indirect
+)
 
 require (
 	github.com/gosimple/slug v1.15.0
