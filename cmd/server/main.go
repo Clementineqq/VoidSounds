@@ -7,51 +7,42 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	"voidsounds/internal/components"
 	"voidsounds/internal/config"
+	"voidsounds/internal/handler"
 	"voidsounds/internal/repository"
 	"voidsounds/internal/service"
 )
 
 func main() {
+	// 1. Загружаем конфигурацию
 	cfg := config.Load()
 
+	// 2. Подключаемся к базе данных
 	repository.InitDB(cfg)
 
+	// 3. Инициализируем репозитории
 	eventRepo := repository.NewEventRepository()
+
+	// 4. Инициализируем сервисы
 	eventService := service.NewEventService(eventRepo)
 
+	// 5. Инициализируем хендлеры
+	eventHandler := handler.NewEventHandler(eventService)
+
+	// 6. Настраиваем роутер
 	r := chi.NewRouter()
 
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
+	// Middleware (промежуточные обработчики)
+	r.Use(middleware.Logger)    // Логирование запросов
+	r.Use(middleware.Recoverer) // Восстановление после паники
+	r.Use(middleware.RequestID) // Добавляет ID каждому запросу
 
-	r.Get("/", homeHandler)
-	r.Get("/events", func(w http.ResponseWriter, r *http.Request) {
-		eventsHandler(w, r, eventService)
-	})
+	// 7. Регистрируем маршруты
+	r.Get("/", eventHandler.Home)
+	r.Get("/events", eventHandler.GetAllEvents)
+	r.Get("/event/{id}", eventHandler.GetEventByID)
 
-	log.Println("VoidSounds запущен на http://localhost:8080")
+	// 8. Запускаем сервер
+	log.Printf("VoidSounds запущен на http://localhost:%s", cfg.ServerPort)
 	log.Fatal(http.ListenAndServe(":"+cfg.ServerPort, r))
-}
-
-func homeHandler(w http.ResponseWriter, r *http.Request) {
-	component := components.Home()
-	if err := component.Render(r.Context(), w); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
-
-func eventsHandler(w http.ResponseWriter, r *http.Request, svc *service.EventService) {
-	events, err := svc.GetAllEvents()
-	if err != nil {
-		log.Printf("Ошибка получения мероприятий: %v", err)
-		http.Error(w, "Ошибка получения мероприятий", http.StatusInternalServerError)
-		return
-	}
-
-	component := components.Events(events)
-	if err := component.Render(r.Context(), w); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 }

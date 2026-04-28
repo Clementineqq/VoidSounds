@@ -1,0 +1,59 @@
+package handler
+
+import (
+	"net/http"
+	"strconv"
+
+	"voidsounds/internal/components"
+	"voidsounds/internal/service"
+
+	"github.com/go-chi/chi/v5"
+)
+
+type EventHandler struct {
+	service *service.EventService
+}
+
+func NewEventHandler(service *service.EventService) *EventHandler {
+	return &EventHandler{service: service}
+}
+
+// Главная
+func (h *EventHandler) Home(w http.ResponseWriter, r *http.Request) {
+	components.Home().Render(r.Context(), w)
+}
+
+// Список мероприятий
+func (h *EventHandler) GetAllEvents(w http.ResponseWriter, r *http.Request) {
+	events, err := h.service.GetAllEvents()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	// Если HTMX запрос - только список, иначе полную страницу
+	if r.Header.Get("HX-Request") == "true" {
+		components.EventsContent(events).Render(r.Context(), w)
+	} else {
+		components.Events(events).Render(r.Context(), w)
+	}
+}
+
+// Детальная страница события
+func (h *EventHandler) GetEventByID(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, _ := strconv.Atoi(idStr)
+
+	event, err := h.service.GetEventByID(id)
+	if err != nil {
+		http.Error(w, "Событие не найдено", 404)
+		return
+	}
+
+	// Если HTMX запрос - только контент, иначе полную страницу
+	if r.Header.Get("HX-Request") == "true" {
+		components.EventDetailContent(event).Render(r.Context(), w)
+	} else {
+		components.EventDetailPage(event).Render(r.Context(), w)
+	}
+}
