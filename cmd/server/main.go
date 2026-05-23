@@ -63,9 +63,7 @@ func main() {
 	r.Group(func(r chi.Router) {
 		r.Use(mymw.RequireAuth)
 		r.Post("/event/{id}/buy", eventHandler.BuyTicket)
-		r.Get("/profile", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("Личный кабинет в разработке"))
-		})
+		r.Get("/profile", eventHandler.Profile)
 	})
 
 	// Маршруты организатора (авторизация + роль organizer)
