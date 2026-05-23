@@ -59,32 +59,31 @@ func main() {
 	r.Post("/logout", authHandler.Logout)
 	r.Get("/auth/status", authHandler.GetAuthStatus)
 
-	// Защищенные маршруты (только для авторизованных)
+	// Защищённые маршруты (только для авторизованных)
 	r.Group(func(r chi.Router) {
-		// TODO: добавить middleware проверки авторизации
-		// r.Use(RequireAuth)
-
-		// Покупка билетов
-		// r.Post("/event/{id}/buy", ticketHandler.BuyTicket)
-
-		// Личный кабинет
-		// r.Get("/profile", profileHandler.Profile)
+		r.Use(mymw.RequireAuth)
+		// r.Post("/event/{id}/buy", eventHandler.BuyTicket) ← раскомментируем на Шаге 4
+		r.Get("/profile", func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("Личный кабинет в разработке"))
+		})
 	})
 
-	// Маршруты организатора
+	// Маршруты организатора (авторизация + роль organizer)
 	r.Group(func(r chi.Router) {
-		// TODO: добавить middleware проверки роли organizer
-		// r.Use(RequireRole("organizer"))
+		r.Use(mymw.RequireAuth, mymw.RequireRole("organizer"))
 
-		// Создание мероприятия
 		// r.Get("/organizer/events/create", eventHandler.ShowCreateForm)
 		// r.Post("/organizer/events", eventHandler.CreateEvent)
 		// r.Get("/organizer/events", eventHandler.GetOrganizerEvents)
 		// r.Put("/organizer/events/{id}", eventHandler.UpdateEvent)
 		// r.Delete("/organizer/events/{id}", eventHandler.DeleteEvent)
+
+		// Временная заглушка для теста
+		r.Get("/organizer/events", func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("🎛️ Панель организатора — в разработке"))
+		})
 	})
 
-	// 9. Запускаем сервер
 	log.Printf("VoidSounds запущен на http://localhost:%s", cfg.ServerPort)
 	log.Fatal(http.ListenAndServe(":"+cfg.ServerPort, r))
 }

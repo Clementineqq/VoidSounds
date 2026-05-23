@@ -31,7 +31,6 @@ func (h *EventHandler) GetAllEvents(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Если HTMX запрос - только список, иначе полную страницу
 	if r.Header.Get("HX-Request") == "true" {
 		components.EventsContent(events).Render(r.Context(), w)
 	} else {
@@ -54,10 +53,16 @@ func (h *EventHandler) GetEventByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Если HTMX запрос - только контент, иначе полную страницу
 	if r.Header.Get("HX-Request") == "true" {
 		components.EventDetailContent(event).Render(r.Context(), w)
 	} else {
 		components.EventDetailPage(event).Render(r.Context(), w)
 	}
 }
+
+// func (h *EventHandler) BuyTicket(w http.ResponseWriter, r *http.Request) { ... }
+// func (h *EventHandler) ShowCreateForm(w http.ResponseWriter, r *http.Request) { ... }
+// func (h *EventHandler) CreateEvent(w http.ResponseWriter, r *http.Request) { ... }
+// func (h *EventHandler) GetOrganizerEvents(w http.ResponseWriter, r *http.Request) { ... }
+// func (h *EventHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) { ... }
+// func (h *EventHandler) DeleteEvent(w http.ResponseWriter, r *http.Request) { ... }

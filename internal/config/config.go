@@ -30,7 +30,7 @@ func Load() *Config {
 		DBUser:        getEnv("DB_USER", "postgres"),
 		DBPassword:    getEnv("DB_PASSWORD", "1488"),
 		DBName:        getEnv("DB_NAME", "voidsounds"),
-		SessionSecret: getEnv("SESSION_SECRET", "fallback-dev-secret-123"),
+		SessionSecret: getEnv("SESSION_SECRET", "dev-secret-beshbarmak1499"),
 	}
 }
 
