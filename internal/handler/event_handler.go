@@ -165,7 +165,6 @@ func (h *EventHandler) CreateEvent(w http.ResponseWriter, r *http.Request) {
 			posterURL = &url
 		}
 	}
-	// =======================
 
 	event := &domain.Event{
 		Title:       r.FormValue("title"),
@@ -210,6 +209,28 @@ func (h *EventHandler) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 // PUT /organizer/events/{id} (можно сделать позже, пока заглушка)
 func (h *EventHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Редактирование в разработке (добавим по запросу)"))
+}
+
+// GET /profile - личный кабинет (история билетов)
+func (h *EventHandler) Profile(w http.ResponseWriter, r *http.Request) {
+	userID := middleware.GetUserID(r)
+	if userID == 0 {
+		w.Header().Set("HX-Redirect", "/login")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	tickets, err := h.service.GetUserTickets(userID)
+	if err != nil {
+		components.ErrorMessage(err.Error()).Render(r.Context(), w)
+		return
+	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		components.ProfileContent(tickets).Render(r.Context(), w)
+	} else {
+		components.ProfilePage(tickets).Render(r.Context(), w)
+	}
 }
 
 // func (h *EventHandler) ShowCreateForm(w http.ResponseWriter, r *http.Request) { ... }

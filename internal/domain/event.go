@@ -26,3 +26,20 @@ type Genre struct {
 	Name string `db:"name" json:"name"`
 	Slug string `db:"slug" json:"slug"`
 }
+
+// Ticket - купленный билет (расширенный для отображения)
+type Ticket struct {
+	ID           int       `db:"id" json:"id"`
+	EventID      int       `db:"event_id" json:"event_id"`
+	UserID       int       `db:"user_id" json:"user_id"`
+	Quantity     int       `db:"quantity" json:"quantity"`
+	TotalPrice   int       `db:"total_price" json:"total_price"`
+	PurchaseDate time.Time `db:"purchase_date" json:"purchase_date"`
+	Status       string    `db:"status" json:"status"`
+
+	// Данные мероприятия (для отображения)
+	EventTitle     string    `db:"title" json:"event_title"`
+	EventDate      time.Time `db:"date" json:"event_date"`
+	EventAddress   string    `db:"address" json:"event_address"`
+	EventPosterURL *string   `db:"poster_url" json:"event_poster_url"`
+}

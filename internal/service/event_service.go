@@ -121,3 +121,11 @@ func (s *EventService) DeleteEvent(eventID, organizerID int) error {
 	}
 	return s.repo.Delete(eventID)
 }
+
+// GetUserTickets - получает билеты пользователя с данными мероприятий
+func (s *EventService) GetUserTickets(userID int) ([]domain.Ticket, error) {
+	if userID <= 0 {
+		return nil, fmt.Errorf("неверный ID пользователя")
+	}
+	return s.repo.GetTicketsByUserID(userID)
+}

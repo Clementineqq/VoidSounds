@@ -14,6 +14,7 @@ type EventRepository interface {
 	Update(event *domain.Event) error
 	Delete(id int) error
 	BuyTicket(eventID, userID int) error
+	GetTicketsByUserID(userID int) ([]domain.Ticket, error)
 }
 
 type eventRepository struct{}
@@ -249,6 +250,32 @@ func (r *eventRepository) BuyTicket(eventID, userID int) error {
 
 	// Фиксируем транзакцию
 	return tx.Commit()
+}
+
+// GetTicketsByUserID - получаем купленные билеты пользователя
+func (r *eventRepository) GetTicketsByUserID(userID int) ([]domain.Ticket, error) {
+	if DB == nil {
+		return []domain.Ticket{}, nil // мок для тестов
+	}
+
+	query := `
+        SELECT 
+            t.id, t.event_id, t.user_id, t.quantity, t.total_price, 
+            t.purchase_date, t.status,
+            e.title, e.date, e.address, e.poster_url
+        FROM tickets t
+        JOIN events e ON t.event_id = e.id
+        WHERE t.user_id = $1
+        ORDER BY t.purchase_date DESC
+    `
+
+	var tickets []domain.Ticket
+	err := DB.Select(&tickets, query, userID)
+	if err != nil {
+		return nil, fmt.Errorf("ошибка получения билетов: %w", err)
+	}
+
+	return tickets, nil
 }
 
 // getMockEvents - временные тестовые данные

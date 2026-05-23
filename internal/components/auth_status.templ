@@ -8,7 +8,13 @@ templ AuthStatus(isLoggedIn bool, userName string, userRole string) {
                  { userName } 
                 <span class="text-violet-400 text-xs">({ userRole })</span>
             </span>
-            
+            <a href="/profile"
+            hx-get="/profile"
+            hx-target="#main-content"
+            hx-swap="innerHTML"
+            class="px-3 py-1 text-xs bg-zinc-700 text-zinc-300 rounded-lg hover:bg-zinc-600 transition">
+            Мой профиль
+            </a>            
             if userRole == "organizer" {
                 <a href="/organizer/events" 
                    class="px-3 py-1 text-xs bg-violet-600/20 text-violet-400 rounded-lg hover:bg-violet-600/30 transition">

@@ -57,7 +57,7 @@ func AuthStatus(isLoggedIn bool, userName string, userRole string) templ.Compone
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, ")</span></span> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, ")</span></span> <a href=\"/profile\" hx-get=\"/profile\" hx-target=\"#main-content\" hx-swap=\"innerHTML\" class=\"px-3 py-1 text-xs bg-zinc-700 text-zinc-300 rounded-lg hover:bg-zinc-600 transition\">Мой профиль</a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
