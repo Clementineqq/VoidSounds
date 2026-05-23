@@ -46,3 +46,42 @@ func GetUserID(r *http.Request) int {
 	}
 	return 0
 }
+
+func RequireAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if GetUserID(r) == 0 {
+			// Проверяем, это HTMX-запрос или обычный переход в браузере
+			if r.Header.Get("HX-Request") == "true" {
+				// Для HTMX: отправляем спец-заголовок для редиректа
+				w.Header().Set("HX-Redirect", "/login")
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			// Для обычного браузера: стандартный HTTP-редирект
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func RequireRole(role string) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			session, _ := Store.Get(r, "user-session")
+			userRole, _ := session.Values["user_role"].(string)
+
+			if userRole != role {
+				if r.Header.Get("HX-Request") == "true" {
+					w.Header().Set("HX-Redirect", "/")
+					w.WriteHeader(http.StatusForbidden)
+					w.Write([]byte("Доступ запрещён"))
+					return
+				}
+				http.Redirect(w, r, "/", http.StatusSeeOther)
+				return
+			}
+			next.ServeHTTP(w, r)
+		})
+	}
+}

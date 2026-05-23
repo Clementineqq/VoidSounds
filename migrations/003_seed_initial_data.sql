@@ -1,7 +1,6 @@
 -- 003_seed_initial_data.sql
 -- Начальные данные: жанры и города
 
--- === ЖАНРЫ ===
 INSERT INTO genres (name, slug) VALUES
 ('Инди-рок', 'indi-rock'),
 ('Пост-панк', 'post-punk'),
@@ -20,7 +19,6 @@ INSERT INTO genres (name, slug) VALUES
 ('Джаз', 'jazz')
 ON CONFLICT (slug) DO NOTHING;
 
--- === ГОРОДА ===
 INSERT INTO cities (name, slug) VALUES
 ('Москва', 'moskva'),
 ('Санкт-Петербург', 'sankt-peterburg'),
