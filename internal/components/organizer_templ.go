@@ -319,20 +319,20 @@ func OrganizerForm(ev *domain.Event, title string, action string, method string)
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(action)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 104, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 104, Col: 33}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" hx-target=\"#main-content\" hx-swap=\"innerHTML\" class=\"space-y-4\"><input type=\"hidden\" name=\"_method\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" hx-target=\"#main-content\" hx-swap=\"innerHTML\" enctype=\"multipart/form-data\" class=\"space-y-4\"><input type=\"hidden\" name=\"_method\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(method)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 105, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 106, Col: 65}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
@@ -345,7 +345,7 @@ func OrganizerForm(ev *domain.Event, title string, action string, method string)
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(titleVal(ev))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 109, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 110, Col: 56}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
@@ -358,7 +358,7 @@ func OrganizerForm(ev *domain.Event, title string, action string, method string)
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(dateVal(ev))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 116, Col: 65}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 117, Col: 65}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
@@ -371,7 +371,7 @@ func OrganizerForm(ev *domain.Event, title string, action string, method string)
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(addressVal(ev))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 121, Col: 61}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 122, Col: 61}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
@@ -384,7 +384,7 @@ func OrganizerForm(ev *domain.Event, title string, action string, method string)
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(priceVal(ev))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 129, Col: 59}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 130, Col: 59}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
@@ -397,7 +397,7 @@ func OrganizerForm(ev *domain.Event, title string, action string, method string)
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(availableVal(ev))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 134, Col: 67}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 135, Col: 67}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
@@ -410,26 +410,13 @@ func OrganizerForm(ev *domain.Event, title string, action string, method string)
 		var templ_7745c5c3_Var22 string
 		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(descVal(ev))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 142, Col: 129}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 143, Col: 129}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</textarea></div><div><label class=\"block text-sm mb-1\">URL постера (необязательно)</label> <input type=\"url\" name=\"poster_url\" value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var23 string
-		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(posterVal(ev))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 147, Col: 61}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none\"></div><div class=\"flex gap-3 pt-4\"><button type=\"submit\" class=\"flex-1 bg-violet-600 hover:bg-violet-700 py-3 rounded-xl font-semibold transition\">Сохранить</button> <button type=\"button\" onclick=\"history.back()\" class=\"px-6 py-3 border border-zinc-700 rounded-xl hover:bg-zinc-800 transition\">Отмена</button></div></form></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</textarea></div><div><label class=\"block text-sm mb-1\">Постер (файл)</label> <input type=\"file\" name=\"poster\" accept=\"image/*\" class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 file:bg-zinc-700 file:border-0 file:rounded file:px-4 file:py-2 file:text-sm file:text-zinc-300\"><p class=\"text-xs text-zinc-500 mt-1\">JPG, PNG, макс. 5 МБ</p></div><div class=\"flex gap-3 pt-4\"><button type=\"submit\" class=\"flex-1 bg-violet-600 hover:bg-violet-700 py-3 rounded-xl font-semibold transition\">Сохранить</button> <button type=\"button\" onclick=\"history.back()\" class=\"px-6 py-3 border border-zinc-700 rounded-xl hover:bg-zinc-800 transition\">Отмена</button></div></form></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

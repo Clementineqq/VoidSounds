@@ -101,8 +101,9 @@ templ OrganizerForm(ev *domain.Event, title string, action string, method string
 		<div class="bg-zinc-900 rounded-2xl p-8 border border-zinc-800">
 			<h2 class="text-2xl font-bold mb-6">{ title }</h2>
 			
-			<form hx-post={action} hx-target="#main-content" hx-swap="innerHTML" class="space-y-4">
-				<input type="hidden" name="_method" value={method} />
+            <form hx-post={action} hx-target="#main-content" hx-swap="innerHTML" 
+                enctype="multipart/form-data" class="space-y-4">
+                <input type="hidden" name="_method" value={method} />
 				
 				<div>
 					<label class="block text-sm mb-1">Название</label>
@@ -143,10 +144,11 @@ templ OrganizerForm(ev *domain.Event, title string, action string, method string
 				</div>
 
 				<div>
-					<label class="block text-sm mb-1">URL постера (необязательно)</label>
-					<input type="url" name="poster_url" value={posterVal(ev)}
-						   class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
-				</div>
+                    <label class="block text-sm mb-1">Постер (файл)</label>
+                    <input type="file" name="poster" accept="image/*"
+                        class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 file:bg-zinc-700 file:border-0 file:rounded file:px-4 file:py-2 file:text-sm file:text-zinc-300">
+                    <p class="text-xs text-zinc-500 mt-1">JPG, PNG, макс. 5 МБ</p>
+                </div>
 
 				<div class="flex gap-3 pt-4">
 					<button type="submit" class="flex-1 bg-violet-600 hover:bg-violet-700 py-3 rounded-xl font-semibold transition">

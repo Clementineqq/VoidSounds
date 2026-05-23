@@ -62,7 +62,6 @@ func (s *EventService) CreateEvent(event *domain.Event) error {
 	return s.repo.Create(event)
 }
 
-// BuyTicket - бизнес-логика покупки билета ← НОВЫЙ МЕТОД
 func (s *EventService) BuyTicket(eventID, userID int) error {
 	if eventID <= 0 || userID <= 0 {
 		return fmt.Errorf("неверные параметры покупки")
@@ -72,6 +71,12 @@ func (s *EventService) BuyTicket(eventID, userID int) error {
 	if err != nil {
 		return fmt.Errorf("мероприятие не найдено")
 	}
+
+	// 🔥 НОВАЯ ПРОВЕРКА: организатор не может купить билет на своё мероприятие
+	if event.OrganizerID == userID {
+		return fmt.Errorf("организаторы не могут покупать билеты на свои мероприятия")
+	}
+
 	if event.Status != "published" {
 		return fmt.Errorf("мероприятие не доступно для покупки")
 	}

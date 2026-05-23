@@ -1,8 +1,13 @@
 package handler
 
 import (
+	"fmt"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"voidsounds/internal/components"
@@ -118,12 +123,12 @@ func (h *EventHandler) GetOrganizerEvents(w http.ResponseWriter, r *http.Request
 
 // POST /organizer/events - создание мероприятия
 func (h *EventHandler) CreateEvent(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
+	r.ParseMultipartForm(5 << 20) // лимит 5MB
 
 	dateStr := r.FormValue("date")
-	date, err := time.Parse("2006-01-02T15:04", dateStr)
+	date, err := time.ParseInLocation("2006-01-02T15:04", dateStr, time.Local)
 	if err != nil {
-		components.ErrorMessage("Неверный формат даты (ГГГГ-ММ-ДД ЧЧ:ММ)").Render(r.Context(), w)
+		components.ErrorMessage("Неверный формат даты").Render(r.Context(), w)
 		return
 	}
 
@@ -136,10 +141,31 @@ func (h *EventHandler) CreateEvent(w http.ResponseWriter, r *http.Request) {
 		cityID = &val
 	}
 
+	// === ЗАГРУЗКА ПОСТЕРА ===
 	var posterURL *string
-	if url := r.FormValue("poster_url"); url != "" {
-		posterURL = &url
+	file, handler, err := r.FormFile("poster")
+	if err == nil && file != nil {
+		defer file.Close()
+
+		// Создаём папку, если нет
+		os.MkdirAll("static/uploads", 0755)
+
+		// Генерируем уникальное имя
+		ext := filepath.Ext(handler.Filename)
+		filename := fmt.Sprintf("%d_%s%s", time.Now().UnixNano(),
+			strings.ToLower(strings.ReplaceAll(r.FormValue("title"), " ", "_")), ext)
+		path := filepath.Join("static/uploads", filename)
+
+		// Сохраняем файл
+		out, err := os.Create(path)
+		if err == nil {
+			defer out.Close()
+			io.Copy(out, file)
+			url := "/static/uploads/" + filename
+			posterURL = &url
+		}
 	}
+	// =======================
 
 	event := &domain.Event{
 		Title:       r.FormValue("title"),
@@ -159,7 +185,6 @@ func (h *EventHandler) CreateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Успех: редирект на список
 	w.Header().Set("HX-Redirect", "/organizer/events")
 	w.WriteHeader(http.StatusCreated)
 }
