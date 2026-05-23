@@ -42,7 +42,11 @@ func (h *EventHandler) GetAllEvents(w http.ResponseWriter, r *http.Request) {
 // Детальная страница события
 func (h *EventHandler) GetEventByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
-	id, _ := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Неверный формат ID", http.StatusBadRequest)
+		return
+	}
 
 	event, err := h.service.GetEventByID(id)
 	if err != nil {

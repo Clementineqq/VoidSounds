@@ -49,7 +49,6 @@ func (r *eventRepository) GetAll() (domain.Events, error) {
 // GetByID - получаем мероприятие по ID (даже если не опубликовано, для организатора)
 func (r *eventRepository) GetByID(id int) (*domain.Event, error) {
 	if DB == nil {
-		// Для разработки: ищем в мок-данных
 		for _, event := range getMockEvents() {
 			if event.ID == id {
 				return &event, nil
