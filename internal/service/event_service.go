@@ -81,3 +81,38 @@ func (s *EventService) BuyTicket(eventID, userID int) error {
 
 	return s.repo.BuyTicket(eventID, userID)
 }
+
+func (s *EventService) GetOrganizerEvents(organizerID int) (domain.Events, error) {
+	if organizerID <= 0 {
+		return nil, fmt.Errorf("неверный ID организатора")
+	}
+	return s.repo.GetByOrganizerID(organizerID)
+}
+
+func (s *EventService) UpdateEvent(eventID, organizerID int, req *domain.Event) error {
+	existing, err := s.repo.GetByID(eventID)
+	if err != nil || existing.OrganizerID != organizerID {
+		return fmt.Errorf("мероприятие не найдено или недоступно")
+	}
+
+	// Применяем изменения
+	existing.Title = req.Title
+	existing.Description = req.Description
+	existing.Date = req.Date
+	existing.Address = req.Address
+	existing.Price = req.Price
+	existing.Available = req.Available
+	existing.Status = req.Status
+	existing.PosterURL = req.PosterURL
+	existing.CityID = req.CityID
+
+	return s.repo.Update(existing)
+}
+
+func (s *EventService) DeleteEvent(eventID, organizerID int) error {
+	existing, err := s.repo.GetByID(eventID)
+	if err != nil || existing.OrganizerID != organizerID {
+		return fmt.Errorf("мероприятие не найдено или недоступно")
+	}
+	return s.repo.Delete(eventID)
+}
