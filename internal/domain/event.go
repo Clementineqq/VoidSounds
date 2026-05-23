@@ -42,4 +42,6 @@ type Ticket struct {
 	EventDate      time.Time `db:"date" json:"event_date"`
 	EventAddress   string    `db:"address" json:"event_address"`
 	EventPosterURL *string   `db:"poster_url" json:"event_poster_url"`
+	EventStatus    string    `db:"event_status" json:"event_status"` // ← ДОБАВИТЬ
+
 }

@@ -14,7 +14,35 @@ import (
 	"voidsounds/internal/domain"
 )
 
-// Полная страница профиля
+// Хелперы для профиля
+func localTime(t time.Time) string {
+	return t.In(time.Local).Format("02.01.2006 • 15:04")
+}
+func statusRu(status string) string {
+	switch status {
+	case "paid":
+		return "Оплачен"
+	case "refunded":
+		return "Возврат"
+	case "cancelled":
+		return "Отменён"
+	default:
+		return status
+	}
+}
+func statusClassRu(status string) string {
+	switch status {
+	case "paid":
+		return "bg-emerald-500/20 text-emerald-400"
+	case "refunded":
+		return "bg-yellow-500/20 text-yellow-400"
+	case "cancelled":
+		return "bg-red-500/20 text-red-400"
+	default:
+		return "bg-zinc-800 text-zinc-400"
+	}
+}
+
 func ProfilePage(tickets []domain.Ticket) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -70,7 +98,6 @@ func ProfilePage(tickets []domain.Ticket) templ.Component {
 	})
 }
 
-// Контент для HTMX (без Layout)
 func ProfileContent(tickets []domain.Ticket) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -103,7 +130,7 @@ func ProfileContent(tickets []domain.Ticket) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			for _, ticket := range tickets {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"bg-zinc-900 p-5 rounded-2xl border border-zinc-800 flex gap-4\"><!-- Постер --><div class=\"w-24 h-24 bg-zinc-800 rounded-xl overflow-hidden flex-shrink-0\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"bg-zinc-900 p-5 rounded-2xl border border-zinc-800 flex gap-4\"><div class=\"w-24 h-24 bg-zinc-800 rounded-xl overflow-hidden flex-shrink-0\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -115,7 +142,7 @@ func ProfileContent(tickets []domain.Ticket) templ.Component {
 					var templ_7745c5c3_Var4 string
 					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(*ticket.EventPosterURL)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 37, Col: 61}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 51, Col: 40}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 					if templ_7745c5c3_Err != nil {
@@ -128,7 +155,7 @@ func ProfileContent(tickets []domain.Ticket) templ.Component {
 					var templ_7745c5c3_Var5 string
 					templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(ticket.EventTitle)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 37, Col: 87}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 51, Col: 66}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 					if templ_7745c5c3_Err != nil {
@@ -144,14 +171,14 @@ func ProfileContent(tickets []domain.Ticket) templ.Component {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div><!-- Инфо --><div class=\"flex-1\"><h3 class=\"font-semibold text-lg\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div><div class=\"flex-1\"><h3 class=\"font-semibold text-lg\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(ticket.EventTitle)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 45, Col: 77}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 57, Col: 59}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
@@ -162,9 +189,9 @@ func ProfileContent(tickets []domain.Ticket) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var7 string
-				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(ticket.EventDate.In(time.Local).Format("02.01.2006 • 15:04"))
+				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(localTime(ticket.EventDate))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 47, Col: 92}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 59, Col: 36}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -177,7 +204,7 @@ func ProfileContent(tickets []domain.Ticket) templ.Component {
 				var templ_7745c5c3_Var8 string
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(ticket.EventAddress)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 47, Col: 118}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 59, Col: 62}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
@@ -190,7 +217,7 @@ func ProfileContent(tickets []domain.Ticket) templ.Component {
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(ticket.Quantity)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 51, Col: 105}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 62, Col: 84}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -203,7 +230,7 @@ func ProfileContent(tickets []domain.Ticket) templ.Component {
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(ticket.TotalPrice)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 52, Col: 107}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 63, Col: 86}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
@@ -213,7 +240,7 @@ func ProfileContent(tickets []domain.Ticket) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var11 = []any{"px-2 py-0.5 rounded " + ticketStatusClass(ticket.Status)}
+				var templ_7745c5c3_Var11 = []any{"px-2 py-0.5 rounded " + statusClassRu(ticket.Status)}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var11...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -236,46 +263,87 @@ func ProfileContent(tickets []domain.Ticket) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var13 string
-				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(ticket.Status)
+				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(statusRu(ticket.Status))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 53, Col: 117}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 64, Col: 102}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</span></div><p class=\"text-xs text-zinc-500 mt-2\">Куплен: ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</span><!-- Статус мероприятия -->")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var14 string
-				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(ticket.PurchaseDate.In(time.Local).Format("02.01.2006 15:04"))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 57, Col: 105}
+				if ticket.EventStatus != "" {
+					var templ_7745c5c3_Var14 = []any{"px-2 py-0.5 rounded " + eventStatusClass(ticket.EventStatus)}
+					templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var14...)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<span class=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var15 string
+					templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var14).String())
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 1, Col: 0}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var16 string
+					templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(eventStatusRu(ticket.EventStatus))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 67, Col: 121}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</span>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</div><p class=\"text-xs text-zinc-500 mt-2\">Куплен: ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</p></div><!-- Кнопка --><div class=\"flex items-center\"><button hx-get=\"")
+				var templ_7745c5c3_Var17 string
+				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(localTime(ticket.PurchaseDate))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 70, Col: 90}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var15 string
-				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs("/event/" + strconv.Itoa(ticket.EventID))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 64, Col: 77}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</p></div><div class=\"flex items-center\"><button hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" hx-target=\"#main-content\" hx-swap=\"innerHTML\" class=\"px-4 py-2 text-sm bg-violet-600 hover:bg-violet-700 rounded-xl transition\">Подробнее</button></div></div>")
+				var templ_7745c5c3_Var18 string
+				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs("/event/" + strconv.Itoa(ticket.EventID))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 73, Col: 63}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "\" hx-target=\"#main-content\" hx-swap=\"innerHTML\" class=\"px-4 py-2 text-sm bg-violet-600 hover:bg-violet-700 rounded-xl transition\">Подробнее</button></div></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -284,12 +352,23 @@ func ProfileContent(tickets []domain.Ticket) templ.Component {
 	})
 }
 
-// Хелпер для статуса билета
-func ticketStatusClass(status string) string {
+func eventStatusRu(status string) string {
 	switch status {
-	case "paid":
-		return "bg-emerald-500/20 text-emerald-400"
-	case "refunded":
+	case "published":
+		return "Активно"
+	case "draft":
+		return "Черновик"
+	case "cancelled":
+		return "Отменено"
+	default:
+		return status
+	}
+}
+func eventStatusClass(status string) string {
+	switch status {
+	case "published":
+		return "bg-blue-500/20 text-blue-400"
+	case "draft":
 		return "bg-yellow-500/20 text-yellow-400"
 	case "cancelled":
 		return "bg-red-500/20 text-red-400"

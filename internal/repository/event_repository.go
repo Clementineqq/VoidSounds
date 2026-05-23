@@ -259,14 +259,14 @@ func (r *eventRepository) GetTicketsByUserID(userID int) ([]domain.Ticket, error
 	}
 
 	query := `
-        SELECT 
-            t.id, t.event_id, t.user_id, t.quantity, t.total_price, 
-            t.purchase_date, t.status,
-            e.title, e.date, e.address, e.poster_url
-        FROM tickets t
-        JOIN events e ON t.event_id = e.id
-        WHERE t.user_id = $1
-        ORDER BY t.purchase_date DESC
+		SELECT 
+			t.id, t.event_id, t.user_id, t.quantity, t.total_price, 
+			t.purchase_date, t.status,
+			e.title, e.date, e.address, e.poster_url, e.status as event_status
+		FROM tickets t
+		JOIN events e ON t.event_id = e.id
+		WHERE t.user_id = $1
+		ORDER BY t.purchase_date DESC
     `
 
 	var tickets []domain.Ticket
