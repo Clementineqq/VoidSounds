@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -147,24 +148,29 @@ func (h *EventHandler) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	if err == nil && file != nil {
 		defer file.Close()
 
-		// Создаём папку, если нет
-		os.MkdirAll("static/uploads", 0755)
+		// Разрешаем только картинки
+		ext := strings.ToLower(filepath.Ext(handler.Filename))
+		if ext != ".jpg" && ext != ".jpeg" && ext != ".png" && ext != ".webp" {
+			components.ErrorMessage("Разрешены только JPG, PNG, WEBP").Render(r.Context(), w)
+			return
+		}
 
-		// Генерируем уникальное имя
-		ext := filepath.Ext(handler.Filename)
-		filename := fmt.Sprintf("%d_%s%s", time.Now().UnixNano(),
-			strings.ToLower(strings.ReplaceAll(r.FormValue("title"), " ", "_")), ext)
+		os.MkdirAll("static/uploads", 0755)
+		safeName := strings.ReplaceAll(r.FormValue("title"), " ", "_")
+		filename := fmt.Sprintf("%d_%s%s", time.Now().UnixNano(), safeName, ext)
 		path := filepath.Join("static/uploads", filename)
 
-		// Сохраняем файл
 		out, err := os.Create(path)
 		if err == nil {
 			defer out.Close()
 			io.Copy(out, file)
-			url := "/static/uploads/" + filename
+			// Для Windows заменяем \ на /, чтобы браузер открывал
+			url := "/static/uploads/" + strings.ReplaceAll(filename, "\\", "/")
 			posterURL = &url
+			log.Printf("🖼️ Постер сохранён: %s", url)
 		}
 	}
+	// =======================
 
 	event := &domain.Event{
 		Title:       r.FormValue("title"),

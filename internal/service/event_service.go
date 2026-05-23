@@ -48,8 +48,8 @@ func (s *EventService) CreateEvent(event *domain.Event) error {
 	if event.Title == "" {
 		return fmt.Errorf("название мероприятия не может быть пустым")
 	}
-	if event.Price < 0 {
-		return fmt.Errorf("цена не может быть отрицательной")
+	if event.Price <= 0 {
+		return fmt.Errorf("не меньше 0")
 	}
 	if event.Available < 0 {
 		return fmt.Errorf("количество билетов не может быть отрицательным")
@@ -72,7 +72,6 @@ func (s *EventService) BuyTicket(eventID, userID int) error {
 		return fmt.Errorf("мероприятие не найдено")
 	}
 
-	// 🔥 НОВАЯ ПРОВЕРКА: организатор не может купить билет на своё мероприятие
 	if event.OrganizerID == userID {
 		return fmt.Errorf("организаторы не могут покупать билеты на свои мероприятия")
 	}
