@@ -72,16 +72,11 @@ func main() {
 	r.Group(func(r chi.Router) {
 		r.Use(mymw.RequireAuth, mymw.RequireRole("organizer"))
 
-		// r.Get("/organizer/events/create", eventHandler.ShowCreateForm)
-		// r.Post("/organizer/events", eventHandler.CreateEvent)
-		// r.Get("/organizer/events", eventHandler.GetOrganizerEvents)
-		// r.Put("/organizer/events/{id}", eventHandler.UpdateEvent)
-		// r.Delete("/organizer/events/{id}", eventHandler.DeleteEvent)
-
-		// Временная заглушка для теста
-		r.Get("/organizer/events", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("🎛️ Панель организатора — в разработке"))
-		})
+		r.Get("/organizer/events/create", eventHandler.ShowCreateForm)
+		r.Post("/organizer/events", eventHandler.CreateEvent)
+		r.Get("/organizer/events", eventHandler.GetOrganizerEvents)
+		r.Delete("/organizer/events/{id}", eventHandler.DeleteEvent)
+		// r.Put("/organizer/events/{id}", eventHandler.UpdateEvent) // Раскомментируем позже
 	})
 
 	log.Printf("VoidSounds запущен на http://localhost:%s", cfg.ServerPort)

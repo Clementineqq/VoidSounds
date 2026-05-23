@@ -1,0 +1,162 @@
+package components
+
+import (
+	"strconv"
+	"voidsounds/internal/domain"
+)
+
+// ===== ХЕЛПЕРЫ ДЛЯ ФОРМЫ (вызываем напрямую в атрибутах) =====
+func titleVal(ev *domain.Event) string {
+	if ev != nil { return ev.Title }
+	return ""
+}
+func dateVal(ev *domain.Event) string {
+	if ev != nil { return ev.Date.Format("2006-01-02T15:04") }
+	return ""
+}
+func addressVal(ev *domain.Event) string {
+	if ev != nil { return ev.Address }
+	return ""
+}
+func priceVal(ev *domain.Event) string {
+	if ev != nil { return strconv.Itoa(ev.Price) }
+	return "0"
+}
+func availableVal(ev *domain.Event) string {
+	if ev != nil { return strconv.Itoa(ev.Available) }
+	return "100"
+}
+func descVal(ev *domain.Event) string {
+	if ev != nil { return ev.Description }
+	return ""
+}
+func posterVal(ev *domain.Event) string {
+	if ev != nil && ev.PosterURL != nil { return *ev.PosterURL }
+	return ""
+}
+func statusClass(status string) string {
+	if status == "published" { return "bg-emerald-500/20 text-emerald-400" }
+	return "bg-yellow-500/20 text-yellow-400"
+}
+
+// ===== ШАБЛОНЫ =====
+
+templ OrganizerPage(events domain.Events) {
+	@Layout("Панель организатора") {
+		<div class="max-w-6xl mx-auto px-6 py-10" id="main-content">
+			<div class="flex justify-between items-center mb-8">
+				<h1 class="text-3xl font-bold">Мои мероприятия</h1>
+				<a href="/organizer/events/create" 
+				   hx-get="/organizer/events/create"
+				   hx-target="#main-content"
+				   hx-swap="innerHTML"
+				   class="bg-violet-600 hover:bg-violet-700 px-6 py-2 rounded-xl font-medium transition">
+					+ Создать
+				</a>
+			</div>
+			@OrganizerList(events)
+		</div>
+	}
+}
+
+templ OrganizerList(events domain.Events) {
+	if len(events) == 0 {
+		<div class="text-center py-16 bg-zinc-900/50 rounded-2xl border border-zinc-800">
+			<p class="text-zinc-400 mb-4">У вас пока нет мероприятий</p>
+			<a href="/organizer/events/create"
+			   hx-get="/organizer/events/create"
+			   hx-target="#main-content"
+			   hx-swap="innerHTML"
+			   class="text-violet-400 hover:underline">Создать первое →</a>
+		</div>
+	} else {
+		<div class="grid gap-4">
+			for _, ev := range events {
+				<div class="bg-zinc-900 p-5 rounded-2xl border border-zinc-800 flex justify-between items-center">
+					<div>
+						<h3 class="font-semibold text-lg">{ ev.Title }</h3>
+						<p class="text-sm text-zinc-400">{ ev.Date.Format("02.01.2006 • 15:04") } | { ev.Address }</p>
+						<div class="flex gap-3 mt-2 text-xs">
+							<span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">{ ev.Available } мест</span>
+							<span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">{ ev.Price } ₽</span>
+							<span class={ "px-2 py-0.5 rounded " + statusClass(ev.Status) }>{ ev.Status }</span>
+						</div>
+					</div>
+					<button 
+						hx-delete={"/organizer/events/" + strconv.Itoa(ev.ID)}
+						hx-target="#main-content"
+						hx-swap="innerHTML"
+						hx-confirm="Удалить мероприятие?"
+						class="px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-xl transition">
+						Удалить
+					</button>
+				</div>
+			}
+		</div>
+	}
+}
+
+templ OrganizerForm(ev *domain.Event, title string, action string, method string) {
+	<div class="max-w-2xl mx-auto px-6 py-10" id="main-content">
+		<div class="bg-zinc-900 rounded-2xl p-8 border border-zinc-800">
+			<h2 class="text-2xl font-bold mb-6">{ title }</h2>
+			
+			<form hx-post={action} hx-target="#main-content" hx-swap="innerHTML" class="space-y-4">
+				<input type="hidden" name="_method" value={method} />
+				
+				<div>
+					<label class="block text-sm mb-1">Название</label>
+					<input type="text" name="title" value={titleVal(ev)} required
+						   class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
+				</div>
+				
+				<div class="grid grid-cols-2 gap-4">
+					<div>
+						<label class="block text-sm mb-1">Дата и время</label>
+						<input type="datetime-local" name="date" value={dateVal(ev)} required
+							   class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
+					</div>
+					<div>
+						<label class="block text-sm mb-1">Место</label>
+						<input type="text" name="address" value={addressVal(ev)} required
+							   class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
+					</div>
+				</div>
+
+				<div class="grid grid-cols-2 gap-4">
+					<div>
+						<label class="block text-sm mb-1">Цена (₽)</label>
+						<input type="number" name="price" value={priceVal(ev)} min="0" required
+							   class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
+					</div>
+					<div>
+						<label class="block text-sm mb-1">Кол-во билетов</label>
+						<input type="number" name="available" value={availableVal(ev)} min="0" required
+							   class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
+					</div>
+				</div>
+
+				<div>
+					<label class="block text-sm mb-1">Описание</label>
+					<textarea name="description" rows="3" required
+							  class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">{descVal(ev)}</textarea>
+				</div>
+
+				<div>
+					<label class="block text-sm mb-1">URL постера (необязательно)</label>
+					<input type="url" name="poster_url" value={posterVal(ev)}
+						   class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
+				</div>
+
+				<div class="flex gap-3 pt-4">
+					<button type="submit" class="flex-1 bg-violet-600 hover:bg-violet-700 py-3 rounded-xl font-semibold transition">
+						Сохранить
+					</button>
+					<button type="button" onclick="history.back()" class="px-6 py-3 border border-zinc-700 rounded-xl hover:bg-zinc-800 transition">
+						Отмена
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+}

@@ -9,6 +9,7 @@ import (
 type EventRepository interface {
 	GetAll() (domain.Events, error)
 	GetByID(id int) (*domain.Event, error)
+	GetByOrganizerID(organizerID int) (domain.Events, error)
 	Create(event *domain.Event) error
 	Update(event *domain.Event) error
 	Delete(id int) error
@@ -176,6 +177,36 @@ func (r *eventRepository) Delete(id int) error {
 	}
 
 	return nil
+}
+
+// GetByOrganizerID - получаем мероприятия конкретного организатора
+func (r *eventRepository) GetByOrganizerID(organizerID int) (domain.Events, error) {
+	if DB == nil {
+		var events domain.Events
+		for _, e := range getMockEvents() {
+			if e.OrganizerID == organizerID {
+				events = append(events, e)
+			}
+		}
+		return events, nil
+	}
+
+	query := `
+        SELECT id, title, description, date, city_id, address,
+               price, available, poster_url, organizer_id,
+               status, created_at, updated_at
+        FROM events
+        WHERE organizer_id = $1
+        ORDER BY date ASC
+    `
+
+	var events domain.Events
+	err := DB.Select(&events, query, organizerID)
+	if err != nil {
+		return nil, fmt.Errorf("ошибка получения событий организатора: %w", err)
+	}
+
+	return events, nil
 }
 
 func (r *eventRepository) BuyTicket(eventID, userID int) error {
