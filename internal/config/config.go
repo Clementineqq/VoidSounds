@@ -8,12 +8,13 @@ import (
 )
 
 type Config struct {
-	ServerPort string
-	DBHost     string
-	DBPort     string
-	DBUser     string
-	DBPassword string
-	DBName     string
+	ServerPort    string
+	DBHost        string
+	DBPort        string
+	DBUser        string
+	DBPassword    string
+	DBName        string
+	SessionSecret string
 }
 
 func Load() *Config {
@@ -23,12 +24,13 @@ func Load() *Config {
 	}
 
 	return &Config{
-		ServerPort: getEnv("SERVER_PORT", "8080"),
-		DBHost:     getEnv("DB_HOST", "localhost"),
-		DBPort:     getEnv("DB_PORT", "5432"),
-		DBUser:     getEnv("DB_USER", "postgres"),
-		DBPassword: getEnv("DB_PASSWORD", "1488"),
-		DBName:     getEnv("DB_NAME", "voidsounds"),
+		ServerPort:    getEnv("SERVER_PORT", "8080"),
+		DBHost:        getEnv("DB_HOST", "localhost"),
+		DBPort:        getEnv("DB_PORT", "5432"),
+		DBUser:        getEnv("DB_USER", "postgres"),
+		DBPassword:    getEnv("DB_PASSWORD", "1488"),
+		DBName:        getEnv("DB_NAME", "voidsounds"),
+		SessionSecret: getEnv("SESSION_SECRET", "fallback-dev-secret-123"),
 	}
 }
 

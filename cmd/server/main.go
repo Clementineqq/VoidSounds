@@ -22,8 +22,7 @@ func main() {
 	repository.InitDB(cfg)
 
 	// 3. Инициализируем сессии
-	mymw.InitSessionStore("super-secret-key-change-me")
-
+	mymw.InitSessionStore(cfg.SessionSecret)
 	// 4. Инициализируем репозитории
 	eventRepo := repository.NewEventRepository()
 	userRepo := repository.NewUserRepository()

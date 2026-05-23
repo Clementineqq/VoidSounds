@@ -107,7 +107,7 @@ func eventDetailContent(event *domain.Event) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if event.Status == "published" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"inline-block px-3 py-1 bg-emerald-500/10 text-emerald-400 text-sm rounded-full mb-6\">✓ Активно</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"inline-block px-3 py-1 bg-emerald-500/10 text-emerald-400 text-sm rounded-full mb-6\">Активно</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -117,7 +117,7 @@ func eventDetailContent(event *domain.Event) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else if event.Status == "cancelled" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"inline-block px-3 py-1 bg-red-500/10 text-red-400 text-sm rounded-full mb-6\">✕ Отменено</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"inline-block px-3 py-1 bg-red-500/10 text-red-400 text-sm rounded-full mb-6\">Отменено</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

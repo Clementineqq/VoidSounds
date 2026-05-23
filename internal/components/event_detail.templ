@@ -40,7 +40,7 @@ templ eventDetailContent(event *domain.Event) {
                 <!-- Статус -->
                 if event.Status == "published" {
                     <div class="inline-block px-3 py-1 bg-emerald-500/10 text-emerald-400 text-sm rounded-full mb-6">
-                        ✓ Активно
+                        Активно
                     </div>
                 } else if event.Status == "draft" {
                     <div class="inline-block px-3 py-1 bg-yellow-500/10 text-yellow-400 text-sm rounded-full mb-6">
@@ -48,7 +48,7 @@ templ eventDetailContent(event *domain.Event) {
                     </div>
                 } else if event.Status == "cancelled" {
                     <div class="inline-block px-3 py-1 bg-red-500/10 text-red-400 text-sm rounded-full mb-6">
-                        ✕ Отменено
+                        Отменено
                     </div>
                 }
 
