@@ -80,5 +80,8 @@ func main() {
 	})
 
 	log.Printf("VoidSounds запущен на http://localhost:%s", cfg.ServerPort)
+	// Раздача загруженных файлов
+	fs := http.FileServer(http.Dir("static"))
+	r.Handle("/static/*", http.StripPrefix("/static/", fs))
 	log.Fatal(http.ListenAndServe(":"+cfg.ServerPort, r))
 }
