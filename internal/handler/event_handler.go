@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"voidsounds/internal/components"
+	"voidsounds/internal/middleware"
 	"voidsounds/internal/service"
 
 	"github.com/go-chi/chi/v5"
@@ -60,7 +61,37 @@ func (h *EventHandler) GetEventByID(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// func (h *EventHandler) BuyTicket(w http.ResponseWriter, r *http.Request) { ... }
+// POST /event/{id}/buy - покупка билета (HTMX)
+func (h *EventHandler) BuyTicket(w http.ResponseWriter, r *http.Request) {
+	// Проверяем авторизацию
+	userID := middleware.GetUserID(r)
+	if userID == 0 {
+		w.Header().Set("HX-Redirect", "/login")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// Получаем ID мероприятия из URL
+	idStr := chi.URLParam(r, "id")
+	eventID, err := strconv.Atoi(idStr)
+	if err != nil {
+		components.ErrorMessage("Неверный ID мероприятия").Render(r.Context(), w)
+		return
+	}
+
+	// Пытаемся купить билет
+	err = h.service.BuyTicket(eventID, userID)
+	if err != nil {
+		// Показываем ошибку
+		components.ErrorMessage(err.Error()).Render(r.Context(), w)
+		return
+	}
+
+	// Успех! Показываем компонент подтверждения
+	// (создадим его ниже)
+	components.TicketSuccess(eventID).Render(r.Context(), w)
+}
+
 // func (h *EventHandler) ShowCreateForm(w http.ResponseWriter, r *http.Request) { ... }
 // func (h *EventHandler) CreateEvent(w http.ResponseWriter, r *http.Request) { ... }
 // func (h *EventHandler) GetOrganizerEvents(w http.ResponseWriter, r *http.Request) { ... }

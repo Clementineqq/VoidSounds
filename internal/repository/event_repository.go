@@ -12,6 +12,7 @@ type EventRepository interface {
 	Create(event *domain.Event) error
 	Update(event *domain.Event) error
 	Delete(id int) error
+	BuyTicket(eventID, userID int) error
 }
 
 type eventRepository struct{}
@@ -175,6 +176,48 @@ func (r *eventRepository) Delete(id int) error {
 	}
 
 	return nil
+}
+
+func (r *eventRepository) BuyTicket(eventID, userID int) error {
+	if DB == nil {
+		return fmt.Errorf("база данных не подключена")
+	}
+
+	// Начинаем транзакцию
+	tx, err := DB.Beginx()
+	if err != nil {
+		return fmt.Errorf("ошибка начала транзакции: %w", err)
+	}
+	defer tx.Rollback() // Откат, если что-то пойдёт не так
+
+	// 1. Проверяем и уменьшаем количество доступных билетов
+	var available int
+	err = tx.Get(&available, "SELECT available FROM events WHERE id = $1 FOR UPDATE", eventID)
+	if err != nil {
+		return fmt.Errorf("ошибка проверки билетов: %w", err)
+	}
+	if available <= 0 {
+		return fmt.Errorf("билетов больше нет")
+	}
+
+	_, err = tx.Exec("UPDATE events SET available = available - 1 WHERE id = $1", eventID)
+	if err != nil {
+		return fmt.Errorf("ошибка обновления события: %w", err)
+	}
+
+	// 2. Создаём запись о покупке в tickets
+	_, err = tx.Exec(`
+		INSERT INTO tickets (event_id, user_id, quantity, total_price, status)
+		VALUES ($1, $2, 1, 
+			(SELECT price FROM events WHERE id = $1), 
+			'paid')
+	`, eventID, userID)
+	if err != nil {
+		return fmt.Errorf("ошибка создания билета: %w", err)
+	}
+
+	// Фиксируем транзакцию
+	return tx.Commit()
 }
 
 // getMockEvents - временные тестовые данные

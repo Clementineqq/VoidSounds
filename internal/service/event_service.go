@@ -36,7 +36,6 @@ func (s *EventService) GetEventByID(id int) (*domain.Event, error) {
 		return nil, fmt.Errorf("сервис: мероприятие %d не найдено: %w", id, err)
 	}
 
-	// Проверяем, что мероприятие опубликовано (или показываем только для организатора)
 	if event.Status != "published" {
 		return nil, fmt.Errorf("мероприятие %d не опубликовано", id)
 	}
@@ -46,7 +45,6 @@ func (s *EventService) GetEventByID(id int) (*domain.Event, error) {
 
 // CreateEvent - создаем мероприятие (будет использоваться организаторами)
 func (s *EventService) CreateEvent(event *domain.Event) error {
-	// Валидация данных
 	if event.Title == "" {
 		return fmt.Errorf("название мероприятия не может быть пустым")
 	}
@@ -57,10 +55,29 @@ func (s *EventService) CreateEvent(event *domain.Event) error {
 		return fmt.Errorf("количество билетов не может быть отрицательным")
 	}
 
-	// Если статус не указан, ставим "draft"
 	if event.Status == "" {
 		event.Status = "draft"
 	}
 
 	return s.repo.Create(event)
+}
+
+// BuyTicket - бизнес-логика покупки билета ← НОВЫЙ МЕТОД
+func (s *EventService) BuyTicket(eventID, userID int) error {
+	if eventID <= 0 || userID <= 0 {
+		return fmt.Errorf("неверные параметры покупки")
+	}
+
+	event, err := s.repo.GetByID(eventID)
+	if err != nil {
+		return fmt.Errorf("мероприятие не найдено")
+	}
+	if event.Status != "published" {
+		return fmt.Errorf("мероприятие не доступно для покупки")
+	}
+	if event.Available <= 0 {
+		return fmt.Errorf("билеты закончились")
+	}
+
+	return s.repo.BuyTicket(eventID, userID)
 }
