@@ -15,6 +15,9 @@ type EventRepository interface {
 	Delete(id int) error
 	BuyTicket(eventID, userID int) error
 	GetTicketsByUserID(userID int) ([]domain.Ticket, error)
+	GetAllCities() ([]domain.City, error)
+	GetAllGenres() ([]domain.Genre, error)
+	GetAllWithFilters(citySlug, genreSlug, search string) (domain.Events, error) // ← ДОБАВИТЬ
 }
 
 type eventRepository struct{}
@@ -304,4 +307,84 @@ func getMockEvents() domain.Events {
 			OrganizerID: 1,
 		},
 	}
+}
+
+// GetAllWithFilters - получаем мероприятия с фильтрами
+func (r *eventRepository) GetAllWithFilters(citySlug, genreSlug, search string) (domain.Events, error) {
+	if DB == nil {
+		return getMockEvents(), nil
+	}
+
+	query := `
+        SELECT DISTINCT e.id, e.title, e.description, e.date, e.city_id, e.address,
+               e.price, e.available, e.poster_url, e.organizer_id,
+               e.status, e.created_at, e.updated_at
+        FROM events e
+        LEFT JOIN event_genres eg ON e.id = eg.event_id
+        LEFT JOIN genres g ON eg.genre_id = g.id
+        WHERE e.status = 'published'
+    `
+	args := []interface{}{}
+	argCount := 1
+
+	// Фильтр по городу
+	if citySlug != "" {
+		query += fmt.Sprintf(" AND e.city_id = (SELECT id FROM cities WHERE slug = $%d)", argCount)
+		args = append(args, citySlug)
+		argCount++
+	}
+
+	// Фильтр по жанру
+	if genreSlug != "" {
+		query += fmt.Sprintf(" AND g.slug = $%d", argCount)
+		args = append(args, genreSlug)
+		argCount++
+	}
+
+	// Поиск по названию/описанию
+	if search != "" {
+		query += fmt.Sprintf(" AND (e.title ILIKE $%d OR e.description ILIKE $%d)", argCount, argCount)
+		args = append(args, "%"+search+"%", "%"+search+"%")
+		argCount++
+	}
+
+	query += " ORDER BY e.date ASC"
+
+	var events domain.Events
+	err := DB.Select(&events, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("ошибка фильтрации событий: %w", err)
+	}
+
+	return events, nil
+}
+
+// GetAllCities - получаем все города
+func (r *eventRepository) GetAllCities() ([]domain.City, error) {
+	if DB == nil {
+		return []domain.City{}, nil
+	}
+
+	query := `SELECT id, name, slug FROM cities ORDER BY name ASC`
+	var cities []domain.City
+	err := DB.Select(&cities, query)
+	if err != nil {
+		return nil, fmt.Errorf("ошибка получения городов: %w", err)
+	}
+	return cities, nil
+}
+
+// GetAllGenres - получаем все жанры
+func (r *eventRepository) GetAllGenres() ([]domain.Genre, error) {
+	if DB == nil {
+		return []domain.Genre{}, nil
+	}
+
+	query := `SELECT id, name, slug FROM genres ORDER BY name ASC`
+	var genres []domain.Genre
+	err := DB.Select(&genres, query)
+	if err != nil {
+		return nil, fmt.Errorf("ошибка получения жанров: %w", err)
+	}
+	return genres, nil
 }

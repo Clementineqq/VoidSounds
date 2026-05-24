@@ -20,13 +20,6 @@ type Event struct {
 
 type Events []Event
 
-// Вспомогательная структура для жанров
-type Genre struct {
-	ID   int    `db:"id" json:"id"`
-	Name string `db:"name" json:"name"`
-	Slug string `db:"slug" json:"slug"`
-}
-
 // Ticket - купленный билет (расширенный для отображения)
 type Ticket struct {
 	ID           int       `db:"id" json:"id"`

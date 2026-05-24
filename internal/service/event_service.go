@@ -138,3 +138,16 @@ func (s *EventService) UpdateStatus(eventID, organizerID int, status string) err
 	existing.Status = status
 	return s.repo.Update(existing)
 }
+
+func (s *EventService) GetAllCities() ([]domain.City, error) {
+	return s.repo.GetAllCities()
+}
+
+func (s *EventService) GetAllGenres() ([]domain.Genre, error) {
+	return s.repo.GetAllGenres()
+}
+
+// GetEventsWithFilters - получает мероприятия с фильтрами
+func (s *EventService) GetEventsWithFilters(citySlug, genreSlug, search string) (domain.Events, error) {
+	return s.repo.GetAllWithFilters(citySlug, genreSlug, search)
+}

@@ -34,7 +34,7 @@ func main() {
 	// 6. Инициализируем хендлеры
 	eventHandler := handler.NewEventHandler(eventService)
 	authHandler := handler.NewAuthHandler(userService)
-
+	adminHandler := handler.NewAdminHandler(eventService, userService)
 	// 7. Настраиваем роутер
 	r := chi.NewRouter()
 
@@ -76,7 +76,11 @@ func main() {
 		r.Delete("/organizer/events/{id}", eventHandler.DeleteEvent)
 		// r.Put("/organizer/events/{id}", eventHandler.UpdateEvent) // Раскомментируем позже
 	})
-
+	// Админка (только для роли admin)
+	r.Group(func(r chi.Router) {
+		r.Use(mymw.RequireAuth, mymw.RequireRole("admin"))
+		r.Get("/admin", adminHandler.Dashboard)
+	})
 	log.Printf("VoidSounds запущен на http://localhost:%s", cfg.ServerPort)
 	// Раздача загруженных файлов
 	fs := http.FileServer(http.Dir("static"))
