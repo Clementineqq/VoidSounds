@@ -69,7 +69,7 @@ func main() {
 	// Маршруты организатора (авторизация + роль organizer)
 	r.Group(func(r chi.Router) {
 		r.Use(mymw.RequireAuth, mymw.RequireRole("organizer"))
-
+		r.Post("/organizer/events/{id}/status", eventHandler.ChangeStatus)
 		r.Get("/organizer/events/create", eventHandler.ShowCreateForm)
 		r.Post("/organizer/events", eventHandler.CreateEvent)
 		r.Get("/organizer/events", eventHandler.GetOrganizerEvents)

@@ -133,7 +133,17 @@ func (h *EventHandler) CreateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	price, _ := strconv.Atoi(r.FormValue("price"))
+	// Парсинг цены / свободного входа
+	isFree := r.FormValue("is_free") == "on"
+	price := 0
+	if !isFree {
+		p, err := strconv.Atoi(r.FormValue("price"))
+		if err != nil {
+			components.ErrorMessage("Неверная цена").Render(r.Context(), w)
+			return
+		}
+		price = p
+	}
 	available, _ := strconv.Atoi(r.FormValue("available"))
 
 	var cityID *int
@@ -237,6 +247,38 @@ func (h *EventHandler) Profile(w http.ResponseWriter, r *http.Request) {
 	} else {
 		components.ProfilePage(tickets).Render(r.Context(), w)
 	}
+}
+
+// POST /organizer/events/{id}/status - смена статуса
+func (h *EventHandler) ChangeStatus(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	newStatus := r.FormValue("status")
+	if newStatus == "" {
+		components.ErrorMessage("Выберите статус").Render(r.Context(), w)
+		return
+	}
+
+	// Разрешаем только валидные статусы
+	allowed := map[string]bool{"published": true, "draft": true, "cancelled": true}
+	if !allowed[newStatus] {
+		components.ErrorMessage("Недопустимый статус").Render(r.Context(), w)
+		return
+	}
+
+	err = h.service.UpdateStatus(id, middleware.GetUserID(r), newStatus)
+	if err != nil {
+		components.ErrorMessage(err.Error()).Render(r.Context(), w)
+		return
+	}
+
+	// Возвращаем обновлённый список
+	h.GetOrganizerEvents(w, r)
 }
 
 // func (h *EventHandler) ShowCreateForm(w http.ResponseWriter, r *http.Request) { ... }

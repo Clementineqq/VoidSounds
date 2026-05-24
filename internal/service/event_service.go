@@ -48,8 +48,9 @@ func (s *EventService) CreateEvent(event *domain.Event) error {
 	if event.Title == "" {
 		return fmt.Errorf("название мероприятия не может быть пустым")
 	}
-	if event.Price <= 0 {
-		return fmt.Errorf("не меньше 0")
+
+	if event.Price < 0 {
+		return fmt.Errorf("цена не может быть отрицательной")
 	}
 	if event.Available < 0 {
 		return fmt.Errorf("количество билетов не может быть отрицательным")
@@ -92,7 +93,6 @@ func (s *EventService) GetOrganizerEvents(organizerID int) (domain.Events, error
 	}
 	return s.repo.GetByOrganizerID(organizerID)
 }
-
 func (s *EventService) UpdateEvent(eventID, organizerID int, req *domain.Event) error {
 	existing, err := s.repo.GetByID(eventID)
 	if err != nil || existing.OrganizerID != organizerID {
@@ -127,4 +127,14 @@ func (s *EventService) GetUserTickets(userID int) ([]domain.Ticket, error) {
 		return nil, fmt.Errorf("неверный ID пользователя")
 	}
 	return s.repo.GetTicketsByUserID(userID)
+}
+
+// UpdateStatus - меняет статус мероприятия (с проверкой прав)
+func (s *EventService) UpdateStatus(eventID, organizerID int, status string) error {
+	existing, err := s.repo.GetByID(eventID)
+	if err != nil || existing.OrganizerID != organizerID {
+		return fmt.Errorf("мероприятие не найдено или нет прав")
+	}
+	existing.Status = status
+	return s.repo.Update(existing)
 }
