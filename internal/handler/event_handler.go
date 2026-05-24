@@ -32,18 +32,34 @@ func (h *EventHandler) Home(w http.ResponseWriter, r *http.Request) {
 	components.Home().Render(r.Context(), w)
 }
 
-// Список мероприятий
+// Список мероприятий (с поддержкой фильтров)
 func (h *EventHandler) GetAllEvents(w http.ResponseWriter, r *http.Request) {
-	events, err := h.service.GetAllEvents()
+	city := r.URL.Query().Get("city")
+	genre := r.URL.Query().Get("genre")
+	search := r.URL.Query().Get("search")
+
+	var events domain.Events
+	var err error
+
+	if city != "" || genre != "" || search != "" {
+		events, err = h.service.GetEventsWithFilters(city, genre, search)
+	} else {
+		events, err = h.service.GetAllEvents()
+	}
+
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	// Получаем города и жанры для фильтров
+	cities, _ := h.service.GetAllCities()
+	genres, _ := h.service.GetAllGenres()
+
 	if r.Header.Get("HX-Request") == "true" {
-		components.EventsContent(events).Render(r.Context(), w)
+		components.EventsContent(events, cities, genres, city, genre, search).Render(r.Context(), w)
 	} else {
-		components.Events(events).Render(r.Context(), w)
+		components.Events(events, cities, genres, city, genre, search).Render(r.Context(), w)
 	}
 }
 
