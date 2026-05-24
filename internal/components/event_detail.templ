@@ -77,19 +77,30 @@ templ eventDetailContent(event *domain.Event) {
                     </div>
                     
                     <div class="space-y-3">
-                        <div class="flex items-center gap-3 text-zinc-300">
-                            <span class="text-2xl">🎫</span>
-                            <div>
-                                <div class="text-sm text-zinc-400">Билетов в продаже</div>
-                                <div class="font-semibold">{ event.Available } шт.</div>
+                        if event.Price > 0 {
+                            <div class="flex items-center gap-3 text-zinc-300">
+                                <span class="text-2xl">🎫</span>
+                                <div>
+                                    <div class="text-sm text-zinc-400">Билетов в продаже</div>
+                                    <div class="font-semibold">{ event.Available } шт.</div>
+                                </div>
                             </div>
-                        </div>
+                        }
                         
                         <div class="flex items-center gap-3 text-zinc-300">
                             <span class="text-2xl">💰</span>
                             <div>
                                 <div class="text-sm text-zinc-400">Стоимость</div>
-                                <div class="text-3xl font-bold text-violet-400">{ event.Price } ₽</div>
+                                if event.Price == 0 {
+                                    <span class="inline-block px-3 py-1.5 bg-emerald-500/10 text-emerald-400 text-sm font-semibold rounded-xl border border-emerald-500/20">
+                                        🎁 Свободный вход
+                                    </span>
+                                } else {
+                                    <div>
+                                        <span class="text-3xl font-bold">{ event.Price }</span>
+                                        <span class="text-zinc-500 text-lg"> ₽</span>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>

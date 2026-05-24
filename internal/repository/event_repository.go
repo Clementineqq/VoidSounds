@@ -180,7 +180,7 @@ func (r *eventRepository) Delete(id int) error {
 	return nil
 }
 
-// GetByOrganizerID - получаем мероприятия конкретного организатора
+// GetByOrganizerID - получаем ВСЕ мероприятия организатора (любые статусы)
 func (r *eventRepository) GetByOrganizerID(organizerID int) (domain.Events, error) {
 	if DB == nil {
 		var events domain.Events

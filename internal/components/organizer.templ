@@ -5,7 +5,7 @@ import (
 	"voidsounds/internal/domain"
 )
 
-// ===== ХЕЛПЕРЫ ДЛЯ ФОРМЫ (вызываем напрямую в атрибутах) =====
+// ===== ХЕЛПЕРЫ =====
 func titleVal(ev *domain.Event) string {
 	if ev != nil { return ev.Title }
 	return ""
@@ -37,6 +37,10 @@ func posterVal(ev *domain.Event) string {
 func statusClass(status string) string {
 	if status == "published" { return "bg-emerald-500/20 text-emerald-400" }
 	return "bg-yellow-500/20 text-yellow-400"
+}
+func selectedIf(condition bool) string {
+	if condition { return "selected" }
+	return ""
 }
 
 // ===== ШАБЛОНЫ =====
@@ -82,14 +86,26 @@ templ OrganizerList(events domain.Events) {
 							<span class={ "px-2 py-0.5 rounded " + statusClass(ev.Status) }>{ ev.Status }</span>
 						</div>
 					</div>
-					<button 
-						hx-delete={"/organizer/events/" + strconv.Itoa(ev.ID)}
-						hx-target="#main-content"
-						hx-swap="innerHTML"
-						hx-confirm="Удалить мероприятие?"
-						class="px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-xl transition">
-						Удалить
-					</button>
+					<div class="flex items-center gap-2">
+						<form hx-post={"/organizer/events/" + strconv.Itoa(ev.ID) + "/status"} 
+							hx-target="#main-content" hx-swap="innerHTML" 
+							method="POST" class="flex items-center">
+							<select name="status" 
+									hx-trigger="change" 
+									hx-post={"/organizer/events/" + strconv.Itoa(ev.ID) + "/status"}
+									hx-target="#main-content" hx-swap="innerHTML"
+									class="bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1 text-xs focus:border-violet-500 outline-none">
+								<option value="published" { selectedIf(ev.Status=="published") }>Активно</option>
+								<option value="draft" { selectedIf(ev.Status=="draft") }>Черновик</option>
+								<option value="cancelled" { selectedIf(ev.Status=="cancelled") }>Отменено</option>
+							</select>
+						</form>
+						<button hx-delete={"/organizer/events/" + strconv.Itoa(ev.ID)} 
+								hx-target="#main-content" hx-swap="innerHTML" hx-confirm="Удалить?"
+								class="px-2 py-1 text-xs text-red-400 hover:bg-red-500/10 rounded transition">
+							Удалить
+						</button>
+					</div>
 				</div>
 			}
 		</div>
@@ -125,17 +141,42 @@ templ OrganizerForm(ev *domain.Event, title string, action string, method string
 				</div>
 
 				<div class="grid grid-cols-2 gap-4">
-					<div>
+					<div id="price-field">
 						<label class="block text-sm mb-1">Цена (₽)</label>
-						<input type="number" name="price" value={priceVal(ev)} min="0" required
-							   class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
+						<input type="number" id="price-input" name="price" value="0" min="0" required
+							class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
 					</div>
-					<div>
-						<label class="block text-sm mb-1">Кол-во билетов</label>
-						<input type="number" name="available" value={availableVal(ev)} min="0" required
-							   class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
+					<div class="flex items-end pb-3">
+						<div class="flex items-center gap-2">
+							<input type="checkbox" id="is-free" name="is_free" class="w-4 h-4 accent-violet-500">
+							<label for="is-free" class="text-sm text-zinc-300 cursor-pointer select-none">Свободный вход</label>
+						</div>
 					</div>
 				</div>
+
+				<script>
+				document.addEventListener('DOMContentLoaded', () => {
+					const cb = document.getElementById('is-free');
+					const priceInput = document.getElementById('price-input');
+					const priceField = document.getElementById('price-field');
+					
+					if(cb && priceInput && priceField) {
+						const togglePrice = () => {
+							if (cb.checked) {
+								priceField.style.display = 'none';
+								priceInput.value = '0';
+								priceInput.required = false;
+							} else {
+								priceField.style.display = 'block';
+								priceInput.required = true;
+							}
+						};
+						
+						cb.addEventListener('change', togglePrice);
+						togglePrice();
+					}
+				});
+				</script>
 
 				<div>
 					<label class="block text-sm mb-1">Описание</label>
