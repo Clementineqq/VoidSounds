@@ -271,7 +271,7 @@ func ProfileContent(tickets []domain.Ticket) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</span><!-- Статус мероприятия -->")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</span> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -301,7 +301,7 @@ func ProfileContent(tickets []domain.Ticket) templ.Component {
 					var templ_7745c5c3_Var16 string
 					templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(eventStatusRu(ticket.EventStatus))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 67, Col: 121}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 66, Col: 121}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 					if templ_7745c5c3_Err != nil {
@@ -319,34 +319,51 @@ func ProfileContent(tickets []domain.Ticket) templ.Component {
 				var templ_7745c5c3_Var17 string
 				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(localTime(ticket.PurchaseDate))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 70, Col: 90}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 69, Col: 90}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</p></div><div class=\"flex items-center\"><button hx-get=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</p></div><div class=\"flex flex-col items-end gap-2\"><button hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var18 string
 				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs("/event/" + strconv.Itoa(ticket.EventID))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 73, Col: 63}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 72, Col: 63}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "\" hx-target=\"#main-content\" hx-swap=\"innerHTML\" class=\"px-4 py-2 text-sm bg-violet-600 hover:bg-violet-700 rounded-xl transition\">Подробнее</button></div></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "\" hx-target=\"#main-content\" hx-swap=\"innerHTML\" class=\"px-4 py-2 text-sm bg-violet-600 hover:bg-violet-700 rounded-xl transition\">Подробнее</button><!-- Кнопка QR для ЭТОГО билета --><button data-ticket-id=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var19 string
+				templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(ticket.ID))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/profile.templ`, Line: 76, Col: 47}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "\" onclick=\"showQRModal(this.dataset.ticketId)\" class=\"px-3 py-1 text-xs bg-emerald-600 hover:bg-emerald-700 rounded-lg transition\">📱 QR</button></div></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<!-- Единое модальное окно (в конце ProfileContent, после цикла) --><div id=\"qr-modal\" class=\"fixed inset-0 bg-black/80 hidden items-center justify-center z-50\" onclick=\"this.classList.add('hidden')\"><div class=\"bg-zinc-900 p-6 rounded-2xl border border-zinc-700 max-w-sm\" onclick=\"event.stopPropagation()\"><h3 class=\"text-lg font-semibold mb-4\">Ваш билет</h3><div id=\"qr-modal-content\" class=\"flex justify-center\"><!-- QR загружается как обычное изображение --><img id=\"qr-image\" src=\"\" alt=\"QR код\" class=\"w-48 h-48\"></div><button onclick=\"document.getElementById('qr-modal').classList.add('hidden')\" class=\"mt-4 w-full py-2 bg-zinc-700 hover:bg-zinc-600 rounded-xl text-sm transition\">Закрыть</button></div></div><!-- Скрипт для показа QR --><script>\r\n\t\t\tfunction showQRModal(ticketID) {\r\n\t\t\t\tconst modal = document.getElementById('qr-modal');\r\n\t\t\t\tconst qrImg = document.getElementById('qr-image');\r\n\t\t\t\tqrImg.src = '/ticket/' + ticketID + '/qr?' + Date.now(); // cache busting\r\n\t\t\t\tmodal.classList.remove('hidden');\r\n\t\t\t}\r\n\t\t\t</script>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
 		}
 		return nil
 	})

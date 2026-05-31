@@ -54,7 +54,16 @@ templ eventDetailContent(event *domain.Event) {
 
                 <!-- Описание -->
                 <p class="text-zinc-300 text-lg leading-relaxed mb-8">{ event.Description }</p>
-
+            <!-- Жанры -->
+            if len(event.Genres) > 0 {
+                <div class="flex flex-wrap gap-2 mb-6">
+                    for _, genre := range event.Genres {
+                        <span class="px-3 py-1 bg-violet-500/10 text-violet-400 text-xs rounded-full border border-violet-500/20">
+                            { genre.Name }
+                        </span>
+                    }
+                </div>
+}
                 <!-- Детали в сетке -->
                 <div class="grid md:grid-cols-2 gap-6 mb-8">
                     <div class="space-y-3">
@@ -72,6 +81,17 @@ templ eventDetailContent(event *domain.Event) {
                             <div>
                                 <div class="text-sm text-zinc-400">Место проведения</div>
                                 <div class="font-semibold">{ event.Address }</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 text-zinc-300">
+                            <span class="text-2xl">👤</span>
+                              <div>
+                                <div class="text-sm text-zinc-400">Организатор</div>
+                                if event.OrganizerName != nil && *event.OrganizerName != "" {
+                                    <div class="font-semibold">{ *event.OrganizerName }</div>
+                                } else {
+                                    <div class="font-semibold text-zinc-500">Не указан</div>
+                                }
                             </div>
                         </div>
                     </div>
@@ -93,7 +113,7 @@ templ eventDetailContent(event *domain.Event) {
                                 <div class="text-sm text-zinc-400">Стоимость</div>
                                 if event.Price == 0 {
                                     <span class="inline-block px-3 py-1.5 bg-emerald-500/10 text-emerald-400 text-sm font-semibold rounded-xl border border-emerald-500/20">
-                                        🎁 Свободный вход
+                                         Свободный вход
                                     </span>
                                 } else {
                                     <div>
@@ -104,7 +124,7 @@ templ eventDetailContent(event *domain.Event) {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>lf
 
                 <!-- Кнопки -->
                 <div class="flex gap-4">

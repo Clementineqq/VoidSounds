@@ -1,0 +1,38 @@
+package components
+
+templ ForOrganizersPage() {
+    @Layout("Для организаторов") {
+        <div class="max-w-4xl mx-auto px-6 py-10" id="main-content">
+            <h1 class="text-4xl font-bold mb-8">🎛️ Для организаторов</h1>
+            
+            <div class="grid gap-6">
+                <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
+                    <h2 class="text-xl font-semibold mb-3">Как начать?</h2>
+                    <ol class="list-decimal list-inside text-zinc-300 space-y-2">
+                        <li>Зарегистрируйтесь с ролью «Организатор»</li>
+                        <li>Перейдите в панель «Мои события»</li>
+                        <li>Создайте мероприятие, загрузите постер</li>
+                        <li>Опубликуйте — и билеты начнут продаваться!</li>
+                    </ol>
+                </div>
+                
+                <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
+                    <h2 class="text-xl font-semibold mb-3">Преимущества</h2>
+                    <ul class="list-disc list-inside text-zinc-300 space-y-1">
+                        <li>будет</li>
+                        <li>будет</li>
+                        <li>будет</li>
+                        <li>будет</li>
+                    </ul>
+                </div>
+                
+                <div class="text-center">
+                    <a href="/register?role=organizer" 
+                       class="inline-block bg-violet-600 hover:bg-violet-700 px-8 py-3 rounded-xl font-semibold transition">
+                        Стать организатором →
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+}

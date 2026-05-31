@@ -312,7 +312,7 @@ func EventsContent(events domain.Events, cities []domain.City, genres []domain.G
 				return templ_7745c5c3_Err
 			}
 			if event.Price == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<span class=\"inline-block px-3 py-1.5 bg-emerald-500/10 text-emerald-400 text-sm font-semibold rounded-xl border border-emerald-500/20\">🎁 Свободный вход</span>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<span class=\"inline-block px-3 py-1.5 bg-emerald-500/10 text-emerald-400 text-sm font-semibold rounded-xl border border-emerald-500/20\">Свободный вход</span>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

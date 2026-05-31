@@ -17,6 +17,7 @@ import (
 	"voidsounds/internal/service"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/skip2/go-qrcode"
 )
 
 type EventHandler struct {
@@ -27,12 +28,10 @@ func NewEventHandler(service *service.EventService) *EventHandler {
 	return &EventHandler{service: service}
 }
 
-// Главная
 func (h *EventHandler) Home(w http.ResponseWriter, r *http.Request) {
 	components.Home().Render(r.Context(), w)
 }
 
-// Список мероприятий (с поддержкой фильтров)
 func (h *EventHandler) GetAllEvents(w http.ResponseWriter, r *http.Request) {
 	city := r.URL.Query().Get("city")
 	genre := r.URL.Query().Get("genre")
@@ -48,11 +47,11 @@ func (h *EventHandler) GetAllEvents(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
+		log.Printf("❌ Ошибка фильтрации: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Получаем города и жанры для фильтров
 	cities, _ := h.service.GetAllCities()
 	genres, _ := h.service.GetAllGenres()
 
@@ -63,7 +62,6 @@ func (h *EventHandler) GetAllEvents(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Детальная страница события
 func (h *EventHandler) GetEventByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
@@ -72,7 +70,7 @@ func (h *EventHandler) GetEventByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	event, err := h.service.GetEventByID(id)
+	event, err := h.service.GetEventWithGenres(id)
 	if err != nil {
 		http.Error(w, "Событие не найдено", 404)
 		return
@@ -85,9 +83,7 @@ func (h *EventHandler) GetEventByID(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// POST /event/{id}/buy - покупка билета (HTMX)
 func (h *EventHandler) BuyTicket(w http.ResponseWriter, r *http.Request) {
-	// Проверяем авторизацию
 	userID := middleware.GetUserID(r)
 	if userID == 0 {
 		w.Header().Set("HX-Redirect", "/login")
@@ -95,7 +91,6 @@ func (h *EventHandler) BuyTicket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Получаем ID мероприятия из URL
 	idStr := chi.URLParam(r, "id")
 	eventID, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -103,25 +98,45 @@ func (h *EventHandler) BuyTicket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Пытаемся купить билет
 	err = h.service.BuyTicket(eventID, userID)
 	if err != nil {
-		// Показываем ошибку
 		components.ErrorMessage(err.Error()).Render(r.Context(), w)
 		return
 	}
 
-	// Успех! Показываем компонент подтверждения
-	// (создадим его ниже)
 	components.TicketSuccess(eventID).Render(r.Context(), w)
 }
 
-// GET /organizer/events/create - форма создания
 func (h *EventHandler) ShowCreateForm(w http.ResponseWriter, r *http.Request) {
-	components.OrganizerForm(nil, "Создание мероприятия", "/organizer/events", "POST").Render(r.Context(), w)
+	genres, _ := h.service.GetAllGenres()
+	components.OrganizerForm(nil, "Создание мероприятия", "/organizer/events", "POST", genres).Render(r.Context(), w)
 }
 
-// GET /organizer/events - список своих мероприятий
+func (h *EventHandler) ShowEditForm(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		components.ErrorMessage("Неверный ID").Render(r.Context(), w)
+		return
+	}
+
+	event, err := h.service.GetEventByIDForEdit(id)
+	if err != nil {
+		components.ErrorMessage("Мероприятие не найдено").Render(r.Context(), w)
+		return
+	}
+
+	if event.OrganizerID != middleware.GetUserID(r) {
+		w.WriteHeader(http.StatusForbidden)
+		w.Write([]byte("Доступ запрещён"))
+		return
+	}
+
+	event.Genres, _ = h.service.GetGenresByEventID(id)
+	genres, _ := h.service.GetAllGenres()
+	components.OrganizerForm(event, "Редактирование мероприятия", "/organizer/events/"+idStr+"/update", "POST", genres).Render(r.Context(), w)
+}
+
 func (h *EventHandler) GetOrganizerEvents(w http.ResponseWriter, r *http.Request) {
 	orgID := middleware.GetUserID(r)
 	events, err := h.service.GetOrganizerEvents(orgID)
@@ -133,14 +148,12 @@ func (h *EventHandler) GetOrganizerEvents(w http.ResponseWriter, r *http.Request
 	if r.Header.Get("HX-Request") == "true" {
 		components.OrganizerList(events).Render(r.Context(), w)
 	} else {
-		// Для прямого входа оборачиваем в Layout
 		components.OrganizerPage(events).Render(r.Context(), w)
 	}
 }
 
-// POST /organizer/events - создание мероприятия
 func (h *EventHandler) CreateEvent(w http.ResponseWriter, r *http.Request) {
-	r.ParseMultipartForm(5 << 20) // лимит 5MB
+	r.ParseMultipartForm(5 << 20)
 
 	dateStr := r.FormValue("date")
 	date, err := time.ParseInLocation("2006-01-02T15:04", dateStr, time.Local)
@@ -149,7 +162,6 @@ func (h *EventHandler) CreateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Парсинг цены / свободного входа
 	isFree := r.FormValue("is_free") == "on"
 	price := 0
 	if !isFree {
@@ -168,35 +180,36 @@ func (h *EventHandler) CreateEvent(w http.ResponseWriter, r *http.Request) {
 		cityID = &val
 	}
 
-	// === ЗАГРУЗКА ПОСТЕРА ===
 	var posterURL *string
-	file, handler, err := r.FormFile("poster")
+	file, header, err := r.FormFile("poster")
 	if err == nil && file != nil {
 		defer file.Close()
-
-		// Разрешаем только картинки
-		ext := strings.ToLower(filepath.Ext(handler.Filename))
+		ext := strings.ToLower(filepath.Ext(header.Filename))
 		if ext != ".jpg" && ext != ".jpeg" && ext != ".png" && ext != ".webp" {
 			components.ErrorMessage("Разрешены только JPG, PNG, WEBP").Render(r.Context(), w)
 			return
 		}
-
 		os.MkdirAll("static/uploads", 0755)
 		safeName := strings.ReplaceAll(r.FormValue("title"), " ", "_")
 		filename := fmt.Sprintf("%d_%s%s", time.Now().UnixNano(), safeName, ext)
 		path := filepath.Join("static/uploads", filename)
-
 		out, err := os.Create(path)
 		if err == nil {
 			defer out.Close()
 			io.Copy(out, file)
-			// Для Windows заменяем \ на /, чтобы браузер открывал
 			url := "/static/uploads/" + strings.ReplaceAll(filename, "\\", "/")
 			posterURL = &url
 			log.Printf("🖼️ Постер сохранён: %s", url)
 		}
 	}
-	// =======================
+
+	// Обработка жанров
+	var genreIDs []int
+	for _, idStr := range r.Form["genres"] {
+		if id, err := strconv.Atoi(idStr); err == nil {
+			genreIDs = append(genreIDs, id)
+		}
+	}
 
 	event := &domain.Event{
 		Title:       r.FormValue("title"),
@@ -211,7 +224,7 @@ func (h *EventHandler) CreateEvent(w http.ResponseWriter, r *http.Request) {
 		Status:      "published",
 	}
 
-	if err := h.service.CreateEvent(event); err != nil {
+	if err := h.service.CreateEventWithGenres(event, genreIDs); err != nil {
 		components.ErrorMessage(err.Error()).Render(r.Context(), w)
 		return
 	}
@@ -220,7 +233,81 @@ func (h *EventHandler) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-// DELETE /organizer/events/{id}
+func (h *EventHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	r.ParseMultipartForm(5 << 20)
+
+	dateStr := r.FormValue("date")
+	date, err := time.ParseInLocation("2006-01-02T15:04", dateStr, time.Local)
+	if err != nil {
+		components.ErrorMessage("Неверный формат даты").Render(r.Context(), w)
+		return
+	}
+
+	isFree := r.FormValue("is_free") == "on"
+	price := 0
+	if !isFree {
+		p, _ := strconv.Atoi(r.FormValue("price"))
+		price = p
+	}
+	available, _ := strconv.Atoi(r.FormValue("available"))
+
+	var posterURL *string
+	file, header, err := r.FormFile("poster")
+	if err == nil && file != nil {
+		defer file.Close()
+		ext := strings.ToLower(filepath.Ext(header.Filename))
+		if ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".webp" {
+			os.MkdirAll("static/uploads", 0755)
+			safeName := strings.ReplaceAll(r.FormValue("title"), " ", "_")
+			filename := fmt.Sprintf("%d_%s%s", time.Now().UnixNano(), safeName, ext)
+			path := filepath.Join("static/uploads", filename)
+			out, err := os.Create(path)
+			if err == nil {
+				defer out.Close()
+				io.Copy(out, file)
+				url := "/static/uploads/" + strings.ReplaceAll(filename, "\\", "/")
+				posterURL = &url
+			}
+		}
+	}
+
+	// Обработка жанров
+	var genreIDs []int
+	for _, idStr := range r.Form["genres"] {
+		if id, err := strconv.Atoi(idStr); err == nil {
+			genreIDs = append(genreIDs, id)
+		}
+	}
+
+	event := &domain.Event{
+		ID:          id,
+		Title:       r.FormValue("title"),
+		Description: r.FormValue("description"),
+		Date:        date,
+		Address:     r.FormValue("address"),
+		Price:       price,
+		Available:   available,
+		PosterURL:   posterURL,
+		Status:      r.FormValue("status"),
+	}
+
+	err = h.service.UpdateEventWithGenres(id, middleware.GetUserID(r), event, genreIDs)
+	if err != nil {
+		components.ErrorMessage(err.Error()).Render(r.Context(), w)
+		return
+	}
+
+	w.Header().Set("HX-Redirect", "/organizer/events")
+	w.WriteHeader(http.StatusOK)
+}
+
 func (h *EventHandler) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
@@ -234,16 +321,9 @@ func (h *EventHandler) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Возвращаем обновлённый список
 	h.GetOrganizerEvents(w, r)
 }
 
-// PUT /organizer/events/{id} (можно сделать позже, пока заглушка)
-func (h *EventHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Редактирование в разработке (добавим по запросу)"))
-}
-
-// GET /profile - личный кабинет (история билетов)
 func (h *EventHandler) Profile(w http.ResponseWriter, r *http.Request) {
 	userID := middleware.GetUserID(r)
 	if userID == 0 {
@@ -265,7 +345,6 @@ func (h *EventHandler) Profile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// POST /organizer/events/{id}/status - смена статуса
 func (h *EventHandler) ChangeStatus(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
@@ -280,7 +359,6 @@ func (h *EventHandler) ChangeStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Разрешаем только валидные статусы
 	allowed := map[string]bool{"published": true, "draft": true, "cancelled": true}
 	if !allowed[newStatus] {
 		components.ErrorMessage("Недопустимый статус").Render(r.Context(), w)
@@ -293,12 +371,17 @@ func (h *EventHandler) ChangeStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Возвращаем обновлённый список
 	h.GetOrganizerEvents(w, r)
 }
 
-// func (h *EventHandler) ShowCreateForm(w http.ResponseWriter, r *http.Request) { ... }
-// func (h *EventHandler) CreateEvent(w http.ResponseWriter, r *http.Request) { ... }
-// func (h *EventHandler) GetOrganizerEvents(w http.ResponseWriter, r *http.Request) { ... }
-// func (h *EventHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) { ... }
-// func (h *EventHandler) DeleteEvent(w http.ResponseWriter, r *http.Request) { ... }
+func (h *EventHandler) TicketQR(w http.ResponseWriter, r *http.Request) {
+	ticketID := chi.URLParam(r, "id")
+	qrData := fmt.Sprintf("https://voidsounds.ru/ticket/verify/%s", ticketID)
+	png, err := qrcode.Encode(qrData, qrcode.Medium, 256)
+	if err != nil {
+		http.Error(w, "Ошибка генерации QR", 500)
+		return
+	}
+	w.Header().Set("Content-Type", "image/png")
+	w.Write(png)
+}

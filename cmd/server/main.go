@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
+	"voidsounds/internal/components"
 	"voidsounds/internal/config"
 	"voidsounds/internal/handler"
 	mymw "voidsounds/internal/middleware" // alias чтобы не конфликтовало с chi/middleware
@@ -15,6 +16,7 @@ import (
 )
 
 func main() {
+
 	// 1. Загружаем конфигурацию
 	cfg := config.Load()
 
@@ -39,10 +41,11 @@ func main() {
 	r := chi.NewRouter()
 
 	// Middleware
+	r.Use(mymw.MethodOverride)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.RequestID)
-	r.Use(mymw.AuthMiddleware) // Добавляем middleware авторизации
+	r.Use(mymw.AuthMiddleware)
 
 	// 8. Регистрируем маршруты
 
@@ -64,6 +67,7 @@ func main() {
 		r.Use(mymw.RequireAuth)
 		r.Post("/event/{id}/buy", eventHandler.BuyTicket)
 		r.Get("/profile", eventHandler.Profile)
+		r.Get("/ticket/{id}/qr", eventHandler.TicketQR)
 	})
 
 	// Маршруты организатора (авторизация + роль organizer)
@@ -74,13 +78,30 @@ func main() {
 		r.Post("/organizer/events", eventHandler.CreateEvent)
 		r.Get("/organizer/events", eventHandler.GetOrganizerEvents)
 		r.Delete("/organizer/events/{id}", eventHandler.DeleteEvent)
-		// r.Put("/organizer/events/{id}", eventHandler.UpdateEvent) // Раскомментируем позже
+		r.Get("/organizer/events/{id}/edit", eventHandler.ShowEditForm)
+		r.Put("/organizer/events/{id}", eventHandler.UpdateEvent)
 	})
 	// Админка (только для роли admin)
 	r.Group(func(r chi.Router) {
 		r.Use(mymw.RequireAuth, mymw.RequireRole("admin"))
 		r.Get("/admin", adminHandler.Dashboard)
 	})
+
+	// Публичные информационные страницы
+	r.Get("/artists", func(w http.ResponseWriter, r *http.Request) {
+		components.ArtistsPage().Render(r.Context(), w)
+	})
+	r.Get("/for-organizers", func(w http.ResponseWriter, r *http.Request) {
+		components.ForOrganizersPage().Render(r.Context(), w)
+	})
+
+	// Инициализация хендлера страниц
+	pageHandler := handler.NewPageHandler()
+
+	// Публичные информационные страницы
+	r.Get("/artists", pageHandler.Artists)
+	r.Get("/for-organizers", pageHandler.ForOrganizers)
+
 	log.Printf("VoidSounds запущен на http://localhost:%s", cfg.ServerPort)
 	// Раздача загруженных файлов
 	fs := http.FileServer(http.Dir("static"))

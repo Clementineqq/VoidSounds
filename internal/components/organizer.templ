@@ -5,7 +5,7 @@ import (
 	"voidsounds/internal/domain"
 )
 
-// ===== ХЕЛПЕРЫ =====
+// ===== ХЕЛПЕРЫ ДЛЯ ФОРМЫ =====
 func titleVal(ev *domain.Event) string {
 	if ev != nil { return ev.Title }
 	return ""
@@ -40,6 +40,16 @@ func statusClass(status string) string {
 }
 func selectedIf(condition bool) string {
 	if condition { return "selected" }
+	return ""
+}
+func genreSelected(genres []domain.Genre, genreID int) string {
+	for _, g := range genres {
+		if g.ID == genreID { return "selected" }
+	}
+	return ""
+}
+func checkedIf(condition bool) string {
+	if condition { return "checked" }
 	return ""
 }
 
@@ -87,14 +97,17 @@ templ OrganizerList(events domain.Events) {
 						</div>
 					</div>
 					<div class="flex items-center gap-2">
+						<a href={"/organizer/events/" + strconv.Itoa(ev.ID) + "/edit"}
+						   hx-get={"/organizer/events/" + strconv.Itoa(ev.ID) + "/edit"}
+						   hx-target="#main-content"
+						   hx-swap="innerHTML"
+						   class="px-2 py-1 text-xs text-violet-400 hover:bg-violet-500/10 rounded transition">
+						   ✏️
+						</a>
 						<form hx-post={"/organizer/events/" + strconv.Itoa(ev.ID) + "/status"} 
-							hx-target="#main-content" hx-swap="innerHTML" 
-							method="POST" class="flex items-center">
-							<select name="status" 
-									hx-trigger="change" 
-									hx-post={"/organizer/events/" + strconv.Itoa(ev.ID) + "/status"}
-									hx-target="#main-content" hx-swap="innerHTML"
-									class="bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1 text-xs focus:border-violet-500 outline-none">
+							  hx-target="#main-content" hx-swap="innerHTML" method="POST">
+							<select name="status" hx-trigger="change"
+									class="bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1 text-xs">
 								<option value="published" { selectedIf(ev.Status=="published") }>Активно</option>
 								<option value="draft" { selectedIf(ev.Status=="draft") }>Черновик</option>
 								<option value="cancelled" { selectedIf(ev.Status=="cancelled") }>Отменено</option>
@@ -103,7 +116,7 @@ templ OrganizerList(events domain.Events) {
 						<button hx-delete={"/organizer/events/" + strconv.Itoa(ev.ID)} 
 								hx-target="#main-content" hx-swap="innerHTML" hx-confirm="Удалить?"
 								class="px-2 py-1 text-xs text-red-400 hover:bg-red-500/10 rounded transition">
-							Удалить
+							🗑️
 						</button>
 					</div>
 				</div>
@@ -112,7 +125,7 @@ templ OrganizerList(events domain.Events) {
 	}
 }
 
-templ OrganizerForm(ev *domain.Event, title string, action string, method string) {
+templ OrganizerForm(ev *domain.Event, title string, action string, method string, genres []domain.Genre) {
 	<div class="max-w-2xl mx-auto px-6 py-10" id="main-content">
 		<div class="bg-zinc-900 rounded-2xl p-8 border border-zinc-800">
 			<h2 class="text-2xl font-bold mb-6">{ title }</h2>
@@ -143,15 +156,33 @@ templ OrganizerForm(ev *domain.Event, title string, action string, method string
 				<div class="grid grid-cols-2 gap-4">
 					<div id="price-field">
 						<label class="block text-sm mb-1">Цена (₽)</label>
-						<input type="number" id="price-input" name="price" value="0" min="0" required
+						<input type="number" id="price-input" name="price" value={priceVal(ev)} min="0" required
 							class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
 					</div>
 					<div class="flex items-end pb-3">
 						<div class="flex items-center gap-2">
-							<input type="checkbox" id="is-free" name="is_free" class="w-4 h-4 accent-violet-500">
+							<input type="checkbox" id="is-free" name="is_free" class="w-4 h-4 accent-violet-500" 
+								   { checkedIf(ev != nil && ev.Price == 0) } />
 							<label for="is-free" class="text-sm text-zinc-300 cursor-pointer select-none">Свободный вход</label>
 						</div>
 					</div>
+				</div>
+
+				<div>
+					<label class="block text-sm mb-1">Количество билетов</label>
+					<input type="number" name="available" value={availableVal(ev)} min="0" required
+						   class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
+				</div>
+
+				<div>
+					<label class="block text-sm mb-1">Жанры</label>
+					<select name="genres" multiple size="4"
+							class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
+						for _, genre := range genres {
+							<option value={ strconv.Itoa(genre.ID) } { genreSelected(genres, genre.ID) }>{ genre.Name }</option>
+						}
+					</select>
+					<p class="text-xs text-zinc-500 mt-1">Удерживайте Ctrl/Cmd для выбора нескольких</p>
 				</div>
 
 				<script>
@@ -171,7 +202,6 @@ templ OrganizerForm(ev *domain.Event, title string, action string, method string
 								priceInput.required = true;
 							}
 						};
-						
 						cb.addEventListener('change', togglePrice);
 						togglePrice();
 					}
@@ -188,7 +218,7 @@ templ OrganizerForm(ev *domain.Event, title string, action string, method string
                     <label class="block text-sm mb-1">Постер (файл)</label>
                     <input type="file" name="poster" accept="image/*"
                         class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 file:bg-zinc-700 file:border-0 file:rounded file:px-4 file:py-2 file:text-sm file:text-zinc-300">
-                    <p class="text-xs text-zinc-500 mt-1">JPG, PNG, макс. 5 МБ</p>
+                    <p class="text-xs text-zinc-500 mt-1">JPG, PNG, WEBP, макс. 5 МБ</p>
                 </div>
 
 				<div class="flex gap-3 pt-4">

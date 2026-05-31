@@ -17,7 +17,9 @@ type EventRepository interface {
 	GetTicketsByUserID(userID int) ([]domain.Ticket, error)
 	GetAllCities() ([]domain.City, error)
 	GetAllGenres() ([]domain.Genre, error)
-	GetAllWithFilters(citySlug, genreSlug, search string) (domain.Events, error) // ← ДОБАВИТЬ
+	GetAllWithFilters(citySlug, genreSlug, search string) (domain.Events, error)
+	GetGenresByEventID(eventID int) ([]domain.Genre, error)
+	AssignGenresToEvent(eventID int, genreIDs []int) error
 }
 
 type eventRepository struct{}
@@ -26,33 +28,19 @@ func NewEventRepository() EventRepository {
 	return &eventRepository{}
 }
 
-// GetAll - получаем все опубликованные мероприятия
 func (r *eventRepository) GetAll() (domain.Events, error) {
 	if DB == nil {
-		// Если БД не подключена, возвращаем мок-данные для тестирования
 		return getMockEvents(), nil
 	}
-
-	query := `
-        SELECT 
-            id, title, description, date, city_id, address,
-            price, available, poster_url, organizer_id,
-            status, created_at, updated_at
-        FROM events
-        WHERE status = 'published'
-        ORDER BY date ASC
-    `
-
+	query := `SELECT id, title, description, date, city_id, address, price, available, poster_url, organizer_id, status, created_at, updated_at FROM events WHERE status = 'published' ORDER BY date ASC`
 	var events domain.Events
 	err := DB.Select(&events, query)
 	if err != nil {
 		return nil, fmt.Errorf("ошибка получения событий: %w", err)
 	}
-
 	return events, nil
 }
 
-// GetByID - получаем мероприятие по ID (даже если не опубликовано, для организатора)
 func (r *eventRepository) GetByID(id int) (*domain.Event, error) {
 	if DB == nil {
 		for _, event := range getMockEvents() {
@@ -62,128 +50,59 @@ func (r *eventRepository) GetByID(id int) (*domain.Event, error) {
 		}
 		return nil, fmt.Errorf("событие с ID %d не найдено", id)
 	}
-
-	query := `
-        SELECT 
-            id, title, description, date, city_id, address,
-            price, available, poster_url, organizer_id,
-            status, created_at, updated_at
-        FROM events
-        WHERE id = $1
-    `
-
+	query := `SELECT id, title, description, date, city_id, address, price, available, poster_url, organizer_id, status, created_at, updated_at FROM events WHERE id = $1`
 	var event domain.Event
 	err := DB.Get(&event, query, id)
 	if err != nil {
 		return nil, fmt.Errorf("ошибка получения события %d: %w", id, err)
 	}
-
 	return &event, nil
 }
 
-// Create - создаем новое мероприятие
 func (r *eventRepository) Create(event *domain.Event) error {
 	if DB == nil {
 		return fmt.Errorf("база данных не подключена")
 	}
-
-	query := `
-        INSERT INTO events (
-            title, description, date, city_id, address,
-            price, available, poster_url, organizer_id, status
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-        RETURNING id, created_at, updated_at
-    `
-
-	err := DB.QueryRowx(
-		query,
-		event.Title,
-		event.Description,
-		event.Date,
-		event.CityID,
-		event.Address,
-		event.Price,
-		event.Available,
-		event.PosterURL,
-		event.OrganizerID,
-		event.Status,
-	).Scan(&event.ID, &event.CreatedAt, &event.UpdatedAt)
-
+	query := `INSERT INTO events (title, description, date, city_id, address, price, available, poster_url, organizer_id, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id, created_at, updated_at`
+	err := DB.QueryRowx(query, event.Title, event.Description, event.Date, event.CityID, event.Address, event.Price, event.Available, event.PosterURL, event.OrganizerID, event.Status).Scan(&event.ID, &event.CreatedAt, &event.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("ошибка создания события: %w", err)
 	}
-
 	return nil
 }
 
-// Update - обновляем существующее мероприятие
 func (r *eventRepository) Update(event *domain.Event) error {
 	if DB == nil {
 		return fmt.Errorf("база данных не подключена")
 	}
-
-	query := `
-        UPDATE events SET
-            title = $1,
-            description = $2,
-            date = $3,
-            city_id = $4,
-            address = $5,
-            price = $6,
-            available = $7,
-            poster_url = $8,
-            status = $9,
-            updated_at = NOW()
-        WHERE id = $10
-    `
-
-	result, err := DB.Exec(
-		query,
-		event.Title,
-		event.Description,
-		event.Date,
-		event.CityID,
-		event.Address,
-		event.Price,
-		event.Available,
-		event.PosterURL,
-		event.Status,
-		event.ID,
-	)
-
+	query := `UPDATE events SET title = $1, description = $2, date = $3, city_id = $4, address = $5, price = $6, available = $7, poster_url = $8, status = $9, updated_at = NOW() WHERE id = $10`
+	result, err := DB.Exec(query, event.Title, event.Description, event.Date, event.CityID, event.Address, event.Price, event.Available, event.PosterURL, event.Status, event.ID)
 	if err != nil {
 		return fmt.Errorf("ошибка обновления события: %w", err)
 	}
-
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		return fmt.Errorf("событие с ID %d не найдено", event.ID)
 	}
-
 	return nil
 }
 
-// Delete - удаляем мероприятие
 func (r *eventRepository) Delete(id int) error {
 	if DB == nil {
 		return fmt.Errorf("база данных не подключена")
 	}
-
 	query := `DELETE FROM events WHERE id = $1`
 	result, err := DB.Exec(query, id)
 	if err != nil {
 		return fmt.Errorf("ошибка удаления события: %w", err)
 	}
-
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		return fmt.Errorf("событие с ID %d не найдено", id)
 	}
-
 	return nil
 }
 
-// GetByOrganizerID - получаем ВСЕ мероприятия организатора (любые статусы)
 func (r *eventRepository) GetByOrganizerID(organizerID int) (domain.Events, error) {
 	if DB == nil {
 		var events domain.Events
@@ -194,22 +113,12 @@ func (r *eventRepository) GetByOrganizerID(organizerID int) (domain.Events, erro
 		}
 		return events, nil
 	}
-
-	query := `
-        SELECT id, title, description, date, city_id, address,
-               price, available, poster_url, organizer_id,
-               status, created_at, updated_at
-        FROM events
-        WHERE organizer_id = $1
-        ORDER BY date ASC
-    `
-
+	query := `SELECT id, title, description, date, city_id, address, price, available, poster_url, organizer_id, status, created_at, updated_at FROM events WHERE organizer_id = $1 ORDER BY date ASC`
 	var events domain.Events
 	err := DB.Select(&events, query, organizerID)
 	if err != nil {
 		return nil, fmt.Errorf("ошибка получения событий организатора: %w", err)
 	}
-
 	return events, nil
 }
 
@@ -217,15 +126,11 @@ func (r *eventRepository) BuyTicket(eventID, userID int) error {
 	if DB == nil {
 		return fmt.Errorf("база данных не подключена")
 	}
-
-	// Начинаем транзакцию
 	tx, err := DB.Beginx()
 	if err != nil {
 		return fmt.Errorf("ошибка начала транзакции: %w", err)
 	}
-	defer tx.Rollback() // Откат, если что-то пойдёт не так
-
-	// 1. Проверяем и уменьшаем количество доступных билетов
+	defer tx.Rollback()
 	var available int
 	err = tx.Get(&available, "SELECT available FROM events WHERE id = $1 FOR UPDATE", eventID)
 	if err != nil {
@@ -234,137 +139,66 @@ func (r *eventRepository) BuyTicket(eventID, userID int) error {
 	if available <= 0 {
 		return fmt.Errorf("билетов больше нет")
 	}
-
 	_, err = tx.Exec("UPDATE events SET available = available - 1 WHERE id = $1", eventID)
 	if err != nil {
 		return fmt.Errorf("ошибка обновления события: %w", err)
 	}
-
-	// 2. Создаём запись о покупке в tickets
-	_, err = tx.Exec(`
-		INSERT INTO tickets (event_id, user_id, quantity, total_price, status)
-		VALUES ($1, $2, 1, 
-			(SELECT price FROM events WHERE id = $1), 
-			'paid')
-	`, eventID, userID)
+	_, err = tx.Exec(`INSERT INTO tickets (event_id, user_id, quantity, total_price, status) VALUES ($1, $2, 1, (SELECT price FROM events WHERE id = $1), 'paid')`, eventID, userID)
 	if err != nil {
 		return fmt.Errorf("ошибка создания билета: %w", err)
 	}
-
-	// Фиксируем транзакцию
 	return tx.Commit()
 }
 
-// GetTicketsByUserID - получаем купленные билеты пользователя
 func (r *eventRepository) GetTicketsByUserID(userID int) ([]domain.Ticket, error) {
 	if DB == nil {
-		return []domain.Ticket{}, nil // мок для тестов
+		return []domain.Ticket{}, nil
 	}
-
-	query := `
-		SELECT 
-			t.id, t.event_id, t.user_id, t.quantity, t.total_price, 
-			t.purchase_date, t.status,
-			e.title, e.date, e.address, e.poster_url, e.status as event_status
-		FROM tickets t
-		JOIN events e ON t.event_id = e.id
-		WHERE t.user_id = $1
-		ORDER BY t.purchase_date DESC
-    `
-
+	query := `SELECT t.id, t.event_id, t.user_id, t.quantity, t.total_price, t.purchase_date, t.status, e.title, e.date, e.address, e.poster_url, e.status as event_status FROM tickets t JOIN events e ON t.event_id = e.id WHERE t.user_id = $1 ORDER BY t.purchase_date DESC`
 	var tickets []domain.Ticket
 	err := DB.Select(&tickets, query, userID)
 	if err != nil {
 		return nil, fmt.Errorf("ошибка получения билетов: %w", err)
 	}
-
 	return tickets, nil
 }
 
-// getMockEvents - временные тестовые данные
-func getMockEvents() domain.Events {
-	return domain.Events{
-		{
-			ID:          1,
-			Title:       "Шум и Выходки в баре «Подвал»",
-			Description: "Сольный концерт группы Шум и Выходки. Nintendo-core, чиптюн, эксперименты.",
-			Date:        time.Date(2026, 5, 15, 20, 0, 0, 0, time.Local),
-			Address:     "Бар «Подвал», Мытищи",
-			Price:       800,
-			Available:   87,
-			Status:      "published",
-			OrganizerID: 1,
-		},
-		{
-			ID:          2,
-			Title:       "Mitski",
-			Description: "Лютый Арт перфоманс Митски в нашем доме!",
-			Date:        time.Date(2026, 5, 9, 22, 0, 0, 0, time.Local),
-			Address:     "квартира жинки любимой, где-то в Самаре",
-			Price:       9999,
-			Available:   0,
-			Status:      "published",
-			OrganizerID: 1,
-		},
-	}
-}
-
-// GetAllWithFilters - получаем мероприятия с фильтрами
 func (r *eventRepository) GetAllWithFilters(citySlug, genreSlug, search string) (domain.Events, error) {
 	if DB == nil {
 		return getMockEvents(), nil
 	}
-
-	query := `
-        SELECT DISTINCT e.id, e.title, e.description, e.date, e.city_id, e.address,
-               e.price, e.available, e.poster_url, e.organizer_id,
-               e.status, e.created_at, e.updated_at
-        FROM events e
-        LEFT JOIN event_genres eg ON e.id = eg.event_id
-        LEFT JOIN genres g ON eg.genre_id = g.id
-        WHERE e.status = 'published'
-    `
+	query := `SELECT DISTINCT e.id, e.title, e.description, e.date, e.city_id, e.address, e.price, e.available, e.poster_url, e.organizer_id, e.status, e.created_at, e.updated_at FROM events e LEFT JOIN event_genres eg ON e.id = eg.event_id LEFT JOIN genres g ON eg.genre_id = g.id WHERE e.status = 'published'`
 	args := []interface{}{}
-	argCount := 1
-
-	// Фильтр по городу
 	if citySlug != "" {
-		query += fmt.Sprintf(" AND e.city_id = (SELECT id FROM cities WHERE slug = $%d)", argCount)
+		query += ` AND (e.city_id = (SELECT id FROM cities WHERE slug = $1) OR e.city_id IS NULL)`
 		args = append(args, citySlug)
-		argCount++
 	}
-
-	// Фильтр по жанру
 	if genreSlug != "" {
-		query += fmt.Sprintf(" AND g.slug = $%d", argCount)
+		if citySlug != "" {
+			query += ` AND g.slug = $2`
+		} else {
+			query += ` AND g.slug = $1`
+		}
 		args = append(args, genreSlug)
-		argCount++
 	}
-
-	// Поиск по названию/описанию
 	if search != "" {
-		query += fmt.Sprintf(" AND (e.title ILIKE $%d OR e.description ILIKE $%d)", argCount, argCount)
-		args = append(args, "%"+search+"%", "%"+search+"%")
-		argCount++
+		nextParam := len(args) + 1
+		query += fmt.Sprintf(` AND (e.title ILIKE $%d OR e.description ILIKE $%d)`, nextParam, nextParam)
+		args = append(args, "%"+search+"%")
 	}
-
 	query += " ORDER BY e.date ASC"
-
 	var events domain.Events
 	err := DB.Select(&events, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("ошибка фильтрации событий: %w", err)
 	}
-
 	return events, nil
 }
 
-// GetAllCities - получаем все города
 func (r *eventRepository) GetAllCities() ([]domain.City, error) {
 	if DB == nil {
 		return []domain.City{}, nil
 	}
-
 	query := `SELECT id, name, slug FROM cities ORDER BY name ASC`
 	var cities []domain.City
 	err := DB.Select(&cities, query)
@@ -374,12 +208,10 @@ func (r *eventRepository) GetAllCities() ([]domain.City, error) {
 	return cities, nil
 }
 
-// GetAllGenres - получаем все жанры
 func (r *eventRepository) GetAllGenres() ([]domain.Genre, error) {
 	if DB == nil {
 		return []domain.Genre{}, nil
 	}
-
 	query := `SELECT id, name, slug FROM genres ORDER BY name ASC`
 	var genres []domain.Genre
 	err := DB.Select(&genres, query)
@@ -387,4 +219,43 @@ func (r *eventRepository) GetAllGenres() ([]domain.Genre, error) {
 		return nil, fmt.Errorf("ошибка получения жанров: %w", err)
 	}
 	return genres, nil
+}
+
+func (r *eventRepository) GetGenresByEventID(eventID int) ([]domain.Genre, error) {
+	if DB == nil {
+		return []domain.Genre{}, nil
+	}
+	query := `SELECT g.id, g.name, g.slug FROM genres g JOIN event_genres eg ON g.id = eg.genre_id WHERE eg.event_id = $1 ORDER BY g.name`
+	var genres []domain.Genre
+	err := DB.Select(&genres, query, eventID)
+	if err != nil {
+		return nil, fmt.Errorf("ошибка получения жанров: %w", err)
+	}
+	return genres, nil
+}
+
+func (r *eventRepository) AssignGenresToEvent(eventID int, genreIDs []int) error {
+	if DB == nil {
+		return fmt.Errorf("база данных не подключена")
+	}
+	// Сначала удаляем старые связи
+	_, err := DB.Exec(`DELETE FROM event_genres WHERE event_id = $1`, eventID)
+	if err != nil {
+		return fmt.Errorf("ошибка удаления старых жанров: %w", err)
+	}
+	// Добавляем новые
+	for _, genreID := range genreIDs {
+		_, err := DB.Exec(`INSERT INTO event_genres (event_id, genre_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`, eventID, genreID)
+		if err != nil {
+			return fmt.Errorf("ошибка добавления жанра %d: %w", genreID, err)
+		}
+	}
+	return nil
+}
+
+func getMockEvents() domain.Events {
+	return domain.Events{
+		{ID: 1, Title: "Шум и Выходки в баре «Подвал»", Description: "Сольный концерт группы Шум и Выходки. Nintendo-core, чиптюн, эксперименты.", Date: time.Date(2026, 5, 15, 20, 0, 0, 0, time.Local), Address: "Бар «Подвал», Мытищи", Price: 800, Available: 87, Status: "published", OrganizerID: 1},
+		{ID: 2, Title: "Mitski", Description: "Лютый Арт перфоманс Митски в нашем доме!", Date: time.Date(2026, 5, 9, 22, 0, 0, 0, time.Local), Address: "квартира жинки любимой, где-то в Самаре", Price: 9999, Available: 0, Status: "published", OrganizerID: 1},
+	}
 }
