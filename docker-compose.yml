@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: voidsounds_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-1488}
+      POSTGRES_DB: ${DB_NAME:-voidsounds}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-voidsounds}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - voidsounds_net
+
+  app:
+    build: .
+    container_name: voidsounds_app
+    ports:
+      - "${SERVER_PORT:-8080}:8080"
+    environment:
+      SERVER_PORT: 8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-1488}
+      DB_NAME: ${DB_NAME:-voidsounds}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - voidsounds_net
+
+  migrate:
+    image: postgres:15-alpine
+    volumes:
+      - ./migrations:/migrations
+    environment:
+      PGPASSWORD: ${DB_PASSWORD:-1488}
+      DB_USER: ${DB_USER:-postgres}
+      DB_NAME: ${DB_NAME:-voidsounds}
+      DB_HOST: postgres
+    command: >
+      sh -c "for f in /migrations/*.sql; do psql -h postgres -U $${DB_USER} -d $${DB_NAME} -f $$f; done"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - voidsounds_net   # <--- добавить эту строку
+    profiles:
+      - migrate
+volumes:
+  postgres_data:
+
+networks:
+  voidsounds_net:
+    driver: bridge
