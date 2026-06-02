@@ -108,15 +108,16 @@ templ OrganizerList(events domain.Events) {
 						   class="px-2 py-1 text-xs text-violet-400 hover:bg-violet-500/10 rounded transition">
 						   ✏️
 						</a>
-						<form hx-post={"/organizer/events/" + strconv.Itoa(ev.ID) + "/status"} 
-							  hx-target="#main-content" hx-swap="innerHTML" method="POST">
-							<select name="status" hx-trigger="change"
-									class="bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1 text-xs">
-								<option value="published" { selectedIf(ev.Status=="published") }>Активно</option>
-								<option value="draft" { selectedIf(ev.Status=="draft") }>Черновик</option>
-								<option value="cancelled" { selectedIf(ev.Status=="cancelled") }>Отменено</option>
-							</select>
-						</form>
+						<select name="status" 
+								hx-post={"/organizer/events/" + strconv.Itoa(ev.ID) + "/status"}
+								hx-trigger="change"
+								hx-target="closest .bg-zinc-900"
+								hx-swap="outerHTML"
+								class="bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1 text-xs">
+							<option value="published" { selectedIf(ev.Status=="published") }>Активно</option>
+							<option value="draft" { selectedIf(ev.Status=="draft") }>Черновик</option>
+							<option value="cancelled" { selectedIf(ev.Status=="cancelled") }>Отменено</option>
+						</select>
 						<button hx-delete={"/organizer/events/" + strconv.Itoa(ev.ID)} 
 								hx-target="#main-content" hx-swap="innerHTML" hx-confirm="Удалить?"
 								class="px-2 py-1 text-xs text-red-400 hover:bg-red-500/10 rounded transition">
