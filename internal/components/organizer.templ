@@ -137,7 +137,9 @@ templ OrganizerForm(ev *domain.Event, title string, action string, method string
             <form hx-post={action} hx-target="#main-content" hx-swap="innerHTML" 
                 enctype="multipart/form-data" class="space-y-4">
                 <input type="hidden" name="_method" value={method} />
-				
+				if ev != nil {
+					<input type="hidden" name="status" value={ev.Status} />
+				}
 				<div>
 					<label class="block text-sm mb-1">Название</label>
 					<input type="text" name="title" value={titleVal(ev)} required
@@ -177,7 +179,7 @@ templ OrganizerForm(ev *domain.Event, title string, action string, method string
 					</div>
 				</div>
 
-<div id="price-field" style="display: block">					<label class="block text-sm mb-1">Цена (₽)</label>
+				<div id="price-field" style="display: block">					<label class="block text-sm mb-1">Цена (₽)</label>
 					<input type="number" id="price-input" name="price" value={priceVal(ev)} min="0"
 						   class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
 				</div>
