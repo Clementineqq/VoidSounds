@@ -286,7 +286,7 @@ func eventDetailContent(event *domain.Event) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</div></div></div></div>lf<!-- Кнопки --><div class=\"flex gap-4\"><button class=\"bg-zinc-700 hover:bg-zinc-600 px-6 py-3 rounded-xl transition-all\" hx-get=\"/events\" hx-target=\"#main-content\" hx-swap=\"innerHTML\">← Назад</button> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</div></div></div></div><!-- Кнопки --><div class=\"flex gap-4\"><button class=\"bg-zinc-700 hover:bg-zinc-600 px-6 py-3 rounded-xl transition-all\" hx-get=\"/events\" hx-target=\"#main-content\" hx-swap=\"innerHTML\">← Назад</button> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

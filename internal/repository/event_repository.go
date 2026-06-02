@@ -50,7 +50,13 @@ func (r *eventRepository) GetByID(id int) (*domain.Event, error) {
 		}
 		return nil, fmt.Errorf("событие с ID %d не найдено", id)
 	}
-	query := `SELECT id, title, description, date, city_id, address, price, available, poster_url, organizer_id, status, created_at, updated_at FROM events WHERE id = $1`
+	query := `SELECT e.id, e.title, e.description, e.date, e.city_id, e.address, 
+							e.price, e.available, e.poster_url, e.organizer_id, e.status, 
+							e.created_at, e.updated_at,
+							u.name as organizer_name
+					FROM events e 
+					LEFT JOIN users u ON e.organizer_id = u.id 
+					WHERE e.id = $1`
 	var event domain.Event
 	err := DB.Get(&event, query, id)
 	if err != nil {
@@ -167,34 +173,49 @@ func (r *eventRepository) GetAllWithFilters(citySlug, genreSlug, search string) 
 	if DB == nil {
 		return getMockEvents(), nil
 	}
-	query := `SELECT DISTINCT e.id, e.title, e.description, e.date, e.city_id, e.address, e.price, e.available, e.poster_url, e.organizer_id, e.status, e.created_at, e.updated_at FROM events e LEFT JOIN event_genres eg ON e.id = eg.event_id LEFT JOIN genres g ON eg.genre_id = g.id WHERE e.status = 'published'`
+
+	query := `SELECT DISTINCT e.id, e.title, e.description, e.date, e.city_id, e.address, 
+                     e.price, e.available, e.poster_url, e.organizer_id, e.status, 
+                     e.created_at, e.updated_at,
+                     u.name as organizer_name
+              FROM events e 
+              LEFT JOIN users u ON e.organizer_id = u.id 
+              LEFT JOIN event_genres eg ON e.id = eg.event_id
+              LEFT JOIN genres g ON eg.genre_id = g.id
+              WHERE e.status = 'published'`
+
 	args := []interface{}{}
+	paramIndex := 1
+
 	if citySlug != "" {
-		query += ` AND (e.city_id = (SELECT id FROM cities WHERE slug = $1) OR e.city_id IS NULL)`
+		query += fmt.Sprintf(` AND (e.city_id = (SELECT id FROM cities WHERE slug = $%d) OR e.address ILIKE '%%' || (SELECT name FROM cities WHERE slug = $%d) || '%%')`, paramIndex, paramIndex)
 		args = append(args, citySlug)
+		paramIndex++
 	}
+	// Фильтр по жанру
 	if genreSlug != "" {
-		if citySlug != "" {
-			query += ` AND g.slug = $2`
-		} else {
-			query += ` AND g.slug = $1`
-		}
+		query += fmt.Sprintf(` AND g.slug = $%d`, paramIndex)
 		args = append(args, genreSlug)
+		paramIndex++
 	}
+
+	// Поиск
 	if search != "" {
-		nextParam := len(args) + 1
-		query += fmt.Sprintf(` AND (e.title ILIKE $%d OR e.description ILIKE $%d)`, nextParam, nextParam)
-		args = append(args, "%"+search+"%")
+		query += fmt.Sprintf(` AND (e.title ILIKE $%d OR e.description ILIKE $%d)`, paramIndex, paramIndex+1)
+		args = append(args, "%"+search+"%", "%"+search+"%")
+		paramIndex += 2
 	}
+
 	query += " ORDER BY e.date ASC"
+
 	var events domain.Events
 	err := DB.Select(&events, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("ошибка фильтрации событий: %w", err)
 	}
+
 	return events, nil
 }
-
 func (r *eventRepository) GetAllCities() ([]domain.City, error) {
 	if DB == nil {
 		return []domain.City{}, nil

@@ -79,7 +79,7 @@ func main() {
 		r.Get("/organizer/events", eventHandler.GetOrganizerEvents)
 		r.Delete("/organizer/events/{id}", eventHandler.DeleteEvent)
 		r.Get("/organizer/events/{id}/edit", eventHandler.ShowEditForm)
-		r.Put("/organizer/events/{id}", eventHandler.UpdateEvent)
+		r.Post("/organizer/events/{id}/update", eventHandler.UpdateEvent)
 	})
 	// Админка (только для роли admin)
 	r.Group(func(r chi.Router) {
