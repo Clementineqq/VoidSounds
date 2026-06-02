@@ -8,6 +8,7 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+// ForOrganizersPage - полная страница с Layout
 func ForOrganizersPage() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -41,13 +42,43 @@ func ForOrganizersPage() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-4xl mx-auto px-6 py-10\" id=\"main-content\"><h1 class=\"text-4xl font-bold mb-8\">🎛️ Для организаторов</h1><div class=\"grid gap-6\"><div class=\"bg-zinc-900 p-6 rounded-2xl border border-zinc-800\"><h2 class=\"text-xl font-semibold mb-3\">Как начать?</h2><ol class=\"list-decimal list-inside text-zinc-300 space-y-2\"><li>Зарегистрируйтесь с ролью «Организатор»</li><li>Перейдите в панель «Мои события»</li><li>Создайте мероприятие, загрузите постер</li><li>Опубликуйте — и билеты начнут продаваться!</li></ol></div><div class=\"bg-zinc-900 p-6 rounded-2xl border border-zinc-800\"><h2 class=\"text-xl font-semibold mb-3\">Преимущества</h2><ul class=\"list-disc list-inside text-zinc-300 space-y-1\"><li>будет</li><li>будет</li><li>будет</li><li>будет</li></ul></div><div class=\"text-center\"><a href=\"/register?role=organizer\" class=\"inline-block bg-violet-600 hover:bg-violet-700 px-8 py-3 rounded-xl font-semibold transition\">Стать организатором →</a></div></div></div>")
+			templ_7745c5c3_Err = ForOrganizersContent().Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			return nil
 		})
 		templ_7745c5c3_Err = Layout("Для организаторов").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+// ForOrganizersContent - только контент (для HTMX)
+func ForOrganizersContent() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var3 == nil {
+			templ_7745c5c3_Var3 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-4xl mx-auto px-6 py-10\" id=\"main-content\"><h1 class=\"text-4xl font-bold mb-8\">🎛️ Для организаторов</h1><div class=\"grid gap-6\"><div class=\"bg-zinc-900 p-6 rounded-2xl border border-zinc-800\"><h2 class=\"text-xl font-semibold mb-3\">Как начать?</h2><ol class=\"list-decimal list-inside text-zinc-300 space-y-2\"><li>Зарегистрируйтесь с ролью «Организатор»</li><li>Перейдите в панель «Мои события»</li><li>Создайте мероприятие, загрузите постер</li><li>Опубликуйте - и билеты начнут продаваться!</li></ol></div><div class=\"bg-zinc-900 p-6 rounded-2xl border border-zinc-800\"><h2 class=\"text-xl font-semibold mb-3\">Преимущества</h2><ul class=\"list-disc list-inside text-zinc-300 space-y-1\"><li>будет</li><li>будет</li><li>будет</li><li>будет</li></ul></div><div class=\"text-center\"><a href=\"/register?role=organizer\" class=\"inline-block bg-violet-600 hover:bg-violet-700 px-8 py-3 rounded-xl font-semibold transition\">Стать организатором →</a></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
