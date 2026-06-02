@@ -92,7 +92,6 @@ func main() {
 	r.Get("/organizer/{id}", eventHandler.ShowOrganizerProfile)
 
 	// Публичные информационные страницы
-	r.Get("/artists", pageHandler.Artists)
 	r.Get("/for-organizers", pageHandler.ForOrganizers)
 
 	log.Printf("VoidSounds запущен на http://localhost:%s", cfg.ServerPort)
