@@ -361,6 +361,12 @@ func (h *EventHandler) ChangeStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Парсим форму
+	if err := r.ParseForm(); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	newStatus := r.FormValue("status")
 	if newStatus == "" {
 		components.ErrorMessage("Выберите статус").Render(r.Context(), w)
@@ -379,7 +385,9 @@ func (h *EventHandler) ChangeStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.GetOrganizerEvents(w, r)
+	// Перенаправляем на список мероприятий организатора
+	w.Header().Set("HX-Redirect", "/organizer/events")
+	w.WriteHeader(http.StatusOK)
 }
 
 func (h *EventHandler) TicketQR(w http.ResponseWriter, r *http.Request) {
