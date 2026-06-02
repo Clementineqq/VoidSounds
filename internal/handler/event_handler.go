@@ -21,11 +21,15 @@ import (
 )
 
 type EventHandler struct {
-	service *service.EventService
+	service     *service.EventService
+	userService *service.UserService
 }
 
-func NewEventHandler(service *service.EventService) *EventHandler {
-	return &EventHandler{service: service}
+func NewEventHandler(service *service.EventService, userService *service.UserService) *EventHandler {
+	return &EventHandler{
+		service:     service,
+		userService: userService,
+	}
 }
 
 func (h *EventHandler) Home(w http.ResponseWriter, r *http.Request) {
@@ -400,4 +404,37 @@ func (h *EventHandler) TicketQR(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "image/png")
 	w.Write(png)
+}
+
+// GET /organizer/{id} - страница организатора
+func (h *EventHandler) ShowOrganizerProfile(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Неверный ID", http.StatusBadRequest)
+		return
+	}
+
+	// Получаем информацию об организаторе
+	organizer, err := h.userService.GetUserByID(id)
+	if err != nil {
+		components.ErrorMessage("Организатор не найден").Render(r.Context(), w)
+		return
+	}
+
+	// Получаем все мероприятия организатора
+	events, err := h.service.GetEventsByOrganizer(id)
+	if err != nil {
+		components.ErrorMessage("Ошибка загрузки мероприятий").Render(r.Context(), w)
+		return
+	}
+
+	// Проверяем тип запроса (HTMX или обычный)
+	if r.Header.Get("HX-Request") == "true" {
+		// Для HTMX рендерим только контент без Layout
+		components.OrganizerProfileContent(organizer, events).Render(r.Context(), w)
+	} else {
+		// Для обычного запроса рендерим полный Layout
+		components.OrganizerProfilePage(organizer, events).Render(r.Context(), w)
+	}
 }
