@@ -92,7 +92,11 @@ templ OrganizerList(events domain.Events) {
 						<p class="text-sm text-zinc-400">{ ev.Date.Format("02.01.2006 • 15:04") } | { ev.Address }</p>
 						<div class="flex gap-3 mt-2 text-xs">
 							<span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">{ ev.Available } мест</span>
-							<span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">{ ev.Price } ₽</span>
+							if ev.Price > 0 {
+								<span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">{ ev.Price } ₽</span>
+							} else {
+								<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">Свободный вход</span>
+							}
 							<span class={ "px-2 py-0.5 rounded " + statusClass(ev.Status) }>{ ev.Status }</span>
 						</div>
 					</div>
@@ -153,25 +157,36 @@ templ OrganizerForm(ev *domain.Event, title string, action string, method string
 					</div>
 				</div>
 
-				<div class="grid grid-cols-2 gap-4">
-					<div id="price-field">
-						<label class="block text-sm mb-1">Цена (₽)</label>
-						<input type="number" id="price-input" name="price" value={priceVal(ev)} min="0" required
-							class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
-					</div>
-					<div class="flex items-end pb-3">
-						<div class="flex items-center gap-2">
-							<input type="checkbox" id="is-free" name="is_free" class="w-4 h-4 accent-violet-500" 
-								   { checkedIf(ev != nil && ev.Price == 0) } />
-							<label for="is-free" class="text-sm text-zinc-300 cursor-pointer select-none">Свободный вход</label>
-						</div>
+				<div>
+					<label class="block text-sm mb-2">Тип мероприятия</label>
+					<div class="flex gap-6 mb-3">
+						<label class="flex items-center gap-2 cursor-pointer">
+							<input type="radio" name="event_type" value="paid" 
+								   { checkedIf(ev == nil || ev.Price > 0) }
+								   class="w-4 h-4 accent-violet-500"
+								   onchange="togglePriceField(this)" />
+							<span class="text-sm text-zinc-300">Платное</span>
+						</label>
+						<label class="flex items-center gap-2 cursor-pointer">
+							<input type="radio" name="event_type" value="free"
+								   { checkedIf(ev != nil && ev.Price == 0) }
+								   class="w-4 h-4 accent-violet-500"
+								   onchange="togglePriceField(this)" />
+							<span class="text-sm text-zinc-300">Бесплатное (свободный вход)</span>
+						</label>
 					</div>
 				</div>
 
+<div id="price-field" style="display: block">					<label class="block text-sm mb-1">Цена (₽)</label>
+					<input type="number" id="price-input" name="price" value={priceVal(ev)} min="0"
+						   class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
+				</div>
+
 				<div>
-					<label class="block text-sm mb-1">Количество билетов</label>
+					<label class="block text-sm mb-1">Количество мест</label>
 					<input type="number" name="available" value={availableVal(ev)} min="0" required
 						   class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
+					<p class="text-xs text-zinc-500 mt-1">Для бесплатных мероприятий укажите максимальное количество участников</p>
 				</div>
 
 				<div>
@@ -186,24 +201,24 @@ templ OrganizerForm(ev *domain.Event, title string, action string, method string
 				</div>
 
 				<script>
-				document.addEventListener('DOMContentLoaded', () => {
-					const cb = document.getElementById('is-free');
-					const priceInput = document.getElementById('price-input');
+				function togglePriceField(radio) {
 					const priceField = document.getElementById('price-field');
+					const priceInput = document.getElementById('price-input');
 					
-					if(cb && priceInput && priceField) {
-						const togglePrice = () => {
-							if (cb.checked) {
-								priceField.style.display = 'none';
-								priceInput.value = '0';
-								priceInput.required = false;
-							} else {
-								priceField.style.display = 'block';
-								priceInput.required = true;
-							}
-						};
-						cb.addEventListener('change', togglePrice);
-						togglePrice();
+					if (radio.value === 'free') {
+						priceField.style.display = 'none';
+						priceInput.value = '0';
+						priceInput.required = false;
+					} else {
+						priceField.style.display = 'block';
+						priceInput.required = true;
+					}
+				}
+
+				document.addEventListener('DOMContentLoaded', () => {
+					const freeRadio = document.querySelector('input[name="event_type"][value="free"]');
+					if (freeRadio && freeRadio.checked) {
+						togglePriceField(freeRadio);
 					}
 				});
 				</script>

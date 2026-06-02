@@ -128,7 +128,7 @@ templ eventDetailContent(event *domain.Event) {
 
                 <!-- Кнопки -->
                 <div class="flex gap-4">
-                    <button 
+                    <button
                         class="bg-zinc-700 hover:bg-zinc-600 px-6 py-3 rounded-xl transition-all"
                         hx-get="/events"
                         hx-target="#main-content"
@@ -137,19 +137,21 @@ templ eventDetailContent(event *domain.Event) {
                         ← Назад
                     </button>
                     
-                    if event.Available > 0 && event.Status == "published" {
-                        <button 
-                            class="bg-violet-600 hover:bg-violet-700 px-8 py-3 rounded-xl font-semibold transition-all active:scale-95"
-                            hx-post={ "/event/" + strconv.Itoa(event.ID) + "/buy" }
-                            hx-target="#main-content"
-                            hx-swap="innerHTML"
-                        >
-                            Купить билет за { event.Price } ₽
-                        </button>
-                    } else if event.Available == 0 {
-                        <button class="bg-zinc-700 px-8 py-3 rounded-xl cursor-not-allowed" disabled>
-                            Билетов нет
-                        </button>
+                    if event.Status == "published" && event.Price > 0 {
+                        if event.Available > 0 {
+                            <button
+                                class="bg-violet-600 hover:bg-violet-700 px-8 py-3 rounded-xl font-semibold transition-all active:scale-95"
+                                hx-post={ "/event/" + strconv.Itoa(event.ID) + "/buy" }
+                                hx-target="#main-content"
+                                hx-swap="innerHTML"
+                            >
+                                Купить билет за { event.Price } ₽
+                            </button>
+                        } else {
+                            <button class="bg-zinc-700 px-8 py-3 rounded-xl cursor-not-allowed" disabled>
+                                Билетов нет
+                            </button>
+                        }
                     }
                 </div>
             </div>
