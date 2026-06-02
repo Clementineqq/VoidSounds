@@ -170,3 +170,7 @@ func (s *EventService) GetAllGenres() ([]domain.Genre, error) {
 func (s *EventService) GetGenresByEventID(eventID int) ([]domain.Genre, error) {
 	return s.repo.GetGenresByEventID(eventID)
 }
+
+func (s *EventService) GetEventsByOrganizer(organizerID int) (domain.Events, error) {
+	return s.repo.GetByOrganizerID(organizerID)
+}

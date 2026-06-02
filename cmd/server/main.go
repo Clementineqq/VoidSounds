@@ -34,7 +34,7 @@ func main() {
 	userService := service.NewUserService(userRepo)
 
 	// 6. Инициализируем хендлеры
-	eventHandler := handler.NewEventHandler(eventService)
+	eventHandler := handler.NewEventHandler(eventService, userService)
 	authHandler := handler.NewAuthHandler(userService)
 	adminHandler := handler.NewAdminHandler(eventService, userService)
 	// 7. Настраиваем роутер
@@ -97,6 +97,8 @@ func main() {
 
 	// Инициализация хендлера страниц
 	pageHandler := handler.NewPageHandler()
+
+	r.Get("/organizer/{id}", eventHandler.ShowOrganizerProfile)
 
 	// Публичные информационные страницы
 	r.Get("/artists", pageHandler.Artists)
