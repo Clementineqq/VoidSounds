@@ -7,7 +7,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	"voidsounds/internal/components"
 	"voidsounds/internal/config"
 	"voidsounds/internal/handler"
 	mymw "voidsounds/internal/middleware" // alias чтобы не конфликтовало с chi/middleware
@@ -85,14 +84,6 @@ func main() {
 	r.Group(func(r chi.Router) {
 		r.Use(mymw.RequireAuth, mymw.RequireRole("admin"))
 		r.Get("/admin", adminHandler.Dashboard)
-	})
-
-	// Публичные информационные страницы
-	r.Get("/artists", func(w http.ResponseWriter, r *http.Request) {
-		components.ArtistsPage().Render(r.Context(), w)
-	})
-	r.Get("/for-organizers", func(w http.ResponseWriter, r *http.Request) {
-		components.ForOrganizersPage().Render(r.Context(), w)
 	})
 
 	// Инициализация хендлера страниц

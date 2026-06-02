@@ -16,5 +16,9 @@ func (h *PageHandler) Artists(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *PageHandler) ForOrganizers(w http.ResponseWriter, r *http.Request) {
-	components.ForOrganizersPage().Render(r.Context(), w)
+	if r.Header.Get("HX-Request") == "true" {
+		components.ForOrganizersContent().Render(r.Context(), w)
+	} else {
+		components.ForOrganizersPage().Render(r.Context(), w)
+	}
 }
