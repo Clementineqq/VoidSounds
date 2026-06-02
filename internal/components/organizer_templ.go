@@ -223,29 +223,40 @@ func OrganizerList(events domain.Events) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, " мест</span> <span class=\"px-2 py-0.5 rounded bg-zinc-800 text-zinc-300\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, " мест</span> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var8 string
-				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(ev.Price)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 95, Col: 77}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, " ₽</span> ")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
+				if ev.Price > 0 {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<span class=\"px-2 py-0.5 rounded bg-zinc-800 text-zinc-300\">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var8 string
+					templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(ev.Price)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 96, Col: 78}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, " ₽</span> ")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				} else {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<span class=\"px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400\">Свободный вход</span> ")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
 				}
 				var templ_7745c5c3_Var9 = []any{"px-2 py-0.5 rounded " + statusClass(ev.Status)}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var9...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<span class=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<span class=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -258,116 +269,116 @@ func OrganizerList(events domain.Events) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(ev.Status)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 96, Col: 82}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 100, Col: 82}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</span></div></div><div class=\"flex items-center gap-2\"><a href=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</span></div></div><div class=\"flex items-center gap-2\"><a href=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var12 templ.SafeURL
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinURLErrs("/organizer/events/" + strconv.Itoa(ev.ID) + "/edit")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 100, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 104, Col: 67}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" hx-get=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var13 string
 				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs("/organizer/events/" + strconv.Itoa(ev.ID) + "/edit")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 101, Col: 69}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 105, Col: 69}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" hx-target=\"#main-content\" hx-swap=\"innerHTML\" class=\"px-2 py-1 text-xs text-violet-400 hover:bg-violet-500/10 rounded transition\">✏️</a><form hx-post=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" hx-target=\"#main-content\" hx-swap=\"innerHTML\" class=\"px-2 py-1 text-xs text-violet-400 hover:bg-violet-500/10 rounded transition\">✏️</a><form hx-post=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var14 string
 				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs("/organizer/events/" + strconv.Itoa(ev.ID) + "/status")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 107, Col: 75}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 111, Col: 75}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" hx-target=\"#main-content\" hx-swap=\"innerHTML\" method=\"POST\"><select name=\"status\" hx-trigger=\"change\" class=\"bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1 text-xs\"><option value=\"published\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" hx-target=\"#main-content\" hx-swap=\"innerHTML\" method=\"POST\"><select name=\"status\" hx-trigger=\"change\" class=\"bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1 text-xs\"><option value=\"published\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var15 string
 				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(selectedIf(ev.Status == "published"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 111, Col: 70}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 115, Col: 70}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(` ` + templ_7745c5c3_Var15))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, ">Активно</option> <option value=\"draft\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, ">Активно</option> <option value=\"draft\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var16 string
 				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(selectedIf(ev.Status == "draft"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 112, Col: 62}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 116, Col: 62}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(` ` + templ_7745c5c3_Var16))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, ">Черновик</option> <option value=\"cancelled\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, ">Черновик</option> <option value=\"cancelled\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var17 string
 				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(selectedIf(ev.Status == "cancelled"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 113, Col: 70}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 117, Col: 70}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(` ` + templ_7745c5c3_Var17))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, ">Отменено</option></select></form><button hx-delete=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, ">Отменено</option></select></form><button hx-delete=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var18 string
 				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs("/organizer/events/" + strconv.Itoa(ev.ID))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 116, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 120, Col: 67}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" hx-target=\"#main-content\" hx-swap=\"innerHTML\" hx-confirm=\"Удалить?\" class=\"px-2 py-1 text-xs text-red-400 hover:bg-red-500/10 rounded transition\">🗑️</button></div></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" hx-target=\"#main-content\" hx-swap=\"innerHTML\" hx-confirm=\"Удалить?\" class=\"px-2 py-1 text-xs text-red-400 hover:bg-red-500/10 rounded transition\">🗑️</button></div></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -397,186 +408,199 @@ func OrganizerForm(ev *domain.Event, title string, action string, method string,
 			templ_7745c5c3_Var19 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"max-w-2xl mx-auto px-6 py-10\" id=\"main-content\"><div class=\"bg-zinc-900 rounded-2xl p-8 border border-zinc-800\"><h2 class=\"text-2xl font-bold mb-6\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<div class=\"max-w-2xl mx-auto px-6 py-10\" id=\"main-content\"><div class=\"bg-zinc-900 rounded-2xl p-8 border border-zinc-800\"><h2 class=\"text-2xl font-bold mb-6\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 131, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 135, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</h2><form hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</h2><form hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(action)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 133, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 137, Col: 33}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "\" hx-target=\"#main-content\" hx-swap=\"innerHTML\" enctype=\"multipart/form-data\" class=\"space-y-4\"><input type=\"hidden\" name=\"_method\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" hx-target=\"#main-content\" hx-swap=\"innerHTML\" enctype=\"multipart/form-data\" class=\"space-y-4\"><input type=\"hidden\" name=\"_method\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var22 string
 		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(method)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 135, Col: 65}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 139, Col: 65}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "\"><div><label class=\"block text-sm mb-1\">Название</label> <input type=\"text\" name=\"title\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\"><div><label class=\"block text-sm mb-1\">Название</label> <input type=\"text\" name=\"title\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var23 string
 		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(titleVal(ev))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 139, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 143, Col: 56}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" required class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none\"></div><div class=\"grid grid-cols-2 gap-4\"><div><label class=\"block text-sm mb-1\">Дата и время</label> <input type=\"datetime-local\" name=\"date\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "\" required class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none\"></div><div class=\"grid grid-cols-2 gap-4\"><div><label class=\"block text-sm mb-1\">Дата и время</label> <input type=\"datetime-local\" name=\"date\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(dateVal(ev))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 146, Col: 65}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 150, Col: 65}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\" required class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none\"></div><div><label class=\"block text-sm mb-1\">Место</label> <input type=\"text\" name=\"address\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "\" required class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none\"></div><div><label class=\"block text-sm mb-1\">Место</label> <input type=\"text\" name=\"address\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(addressVal(ev))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 151, Col: 61}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 155, Col: 61}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "\" required class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none\"></div></div><div class=\"grid grid-cols-2 gap-4\"><div id=\"price-field\"><label class=\"block text-sm mb-1\">Цена (₽)</label> <input type=\"number\" id=\"price-input\" name=\"price\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\" required class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none\"></div></div><div><label class=\"block text-sm mb-2\">Тип мероприятия</label><div class=\"flex gap-6 mb-3\"><label class=\"flex items-center gap-2 cursor-pointer\"><input type=\"radio\" name=\"event_type\" value=\"paid\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var26 string
-		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(priceVal(ev))
+		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(checkedIf(ev == nil || ev.Price > 0))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 159, Col: 76}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 165, Col: 49}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(` ` + templ_7745c5c3_Var26))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "\" min=\"0\" required class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none\"></div><div class=\"flex items-end pb-3\"><div class=\"flex items-center gap-2\"><input type=\"checkbox\" id=\"is-free\" name=\"is_free\" class=\"w-4 h-4 accent-violet-500\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, " class=\"w-4 h-4 accent-violet-500\" onchange=\"togglePriceField(this)\"> <span class=\"text-sm text-zinc-300\">Платное</span></label> <label class=\"flex items-center gap-2 cursor-pointer\"><input type=\"radio\" name=\"event_type\" value=\"free\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(checkedIf(ev != nil && ev.Price == 0))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 165, Col: 50}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 172, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(` ` + templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "> <label for=\"is-free\" class=\"text-sm text-zinc-300 cursor-pointer select-none\">Свободный вход</label></div></div></div><div><label class=\"block text-sm mb-1\">Количество билетов</label> <input type=\"number\" name=\"available\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, " class=\"w-4 h-4 accent-violet-500\" onchange=\"togglePriceField(this)\"> <span class=\"text-sm text-zinc-300\">Бесплатное (свободный вход)</span></label></div></div><div id=\"price-field\" style=\"display: block\"><label class=\"block text-sm mb-1\">Цена (₽)</label> <input type=\"number\" id=\"price-input\" name=\"price\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var28 string
-		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(availableVal(ev))
+		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(priceVal(ev))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 173, Col: 66}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 181, Col: 75}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\" min=\"0\" required class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none\"></div><div><label class=\"block text-sm mb-1\">Жанры</label> <select name=\"genres\" multiple size=\"4\" class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\" min=\"0\" class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none\"></div><div><label class=\"block text-sm mb-1\">Количество мест</label> <input type=\"number\" name=\"available\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var29 string
+		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(availableVal(ev))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 187, Col: 66}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "\" min=\"0\" required class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none\"><p class=\"text-xs text-zinc-500 mt-1\">Для бесплатных мероприятий укажите максимальное количество участников</p></div><div><label class=\"block text-sm mb-1\">Жанры</label> <select name=\"genres\" multiple size=\"4\" class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, genre := range genres {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<option value=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var29 string
-			templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(genre.ID))
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 182, Col: 45}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<option value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var30 string
-			templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(genreSelected(genres, genre.ID))
+			templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(genre.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 182, Col: 81}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 197, Col: 45}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(` ` + templ_7745c5c3_Var30))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, ">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var31 string
-			templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(genre.Name)
+			templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(genreSelected(genres, genre.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 182, Col: 96}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 197, Col: 81}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "</option>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(` ` + templ_7745c5c3_Var31))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, ">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var32 string
+			templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(genre.Name)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 197, Col: 96}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</option>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "</select><p class=\"text-xs text-zinc-500 mt-1\">Удерживайте Ctrl/Cmd для выбора нескольких</p></div><script>\r\n\t\t\t\tdocument.addEventListener('DOMContentLoaded', () => {\r\n\t\t\t\t\tconst cb = document.getElementById('is-free');\r\n\t\t\t\t\tconst priceInput = document.getElementById('price-input');\r\n\t\t\t\t\tconst priceField = document.getElementById('price-field');\r\n\t\t\t\t\t\r\n\t\t\t\t\tif(cb && priceInput && priceField) {\r\n\t\t\t\t\t\tconst togglePrice = () => {\r\n\t\t\t\t\t\t\tif (cb.checked) {\r\n\t\t\t\t\t\t\t\tpriceField.style.display = 'none';\r\n\t\t\t\t\t\t\t\tpriceInput.value = '0';\r\n\t\t\t\t\t\t\t\tpriceInput.required = false;\r\n\t\t\t\t\t\t\t} else {\r\n\t\t\t\t\t\t\t\tpriceField.style.display = 'block';\r\n\t\t\t\t\t\t\t\tpriceInput.required = true;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t};\r\n\t\t\t\t\t\tcb.addEventListener('change', togglePrice);\r\n\t\t\t\t\t\ttogglePrice();\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\t\t\t\t</script><div><label class=\"block text-sm mb-1\">Описание</label> <textarea name=\"description\" rows=\"3\" required class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</select><p class=\"text-xs text-zinc-500 mt-1\">Удерживайте Ctrl/Cmd для выбора нескольких</p></div><script>\r\n\t\t\t\tfunction togglePriceField(radio) {\r\n\t\t\t\t\tconst priceField = document.getElementById('price-field');\r\n\t\t\t\t\tconst priceInput = document.getElementById('price-input');\r\n\t\t\t\t\t\r\n\t\t\t\t\tif (radio.value === 'free') {\r\n\t\t\t\t\t\tpriceField.style.display = 'none';\r\n\t\t\t\t\t\tpriceInput.value = '0';\r\n\t\t\t\t\t\tpriceInput.required = false;\r\n\t\t\t\t\t} else {\r\n\t\t\t\t\t\tpriceField.style.display = 'block';\r\n\t\t\t\t\t\tpriceInput.required = true;\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\r\n\t\t\t\tdocument.addEventListener('DOMContentLoaded', () => {\r\n\t\t\t\t\tconst freeRadio = document.querySelector('input[name=\"event_type\"][value=\"free\"]');\r\n\t\t\t\t\tif (freeRadio && freeRadio.checked) {\r\n\t\t\t\t\t\ttogglePriceField(freeRadio);\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\t\t\t\t</script><div><label class=\"block text-sm mb-1\">Описание</label> <textarea name=\"description\" rows=\"3\" required class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var32 string
-		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(descVal(ev))
+		var templ_7745c5c3_Var33 string
+		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(descVal(ev))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 214, Col: 129}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/organizer.templ`, Line: 229, Col: 129}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "</textarea></div><div><label class=\"block text-sm mb-1\">Постер (файл)</label> <input type=\"file\" name=\"poster\" accept=\"image/*\" class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 file:bg-zinc-700 file:border-0 file:rounded file:px-4 file:py-2 file:text-sm file:text-zinc-300\"><p class=\"text-xs text-zinc-500 mt-1\">JPG, PNG, WEBP, макс. 5 МБ</p></div><div class=\"flex gap-3 pt-4\"><button type=\"submit\" class=\"flex-1 bg-violet-600 hover:bg-violet-700 py-3 rounded-xl font-semibold transition\">Сохранить</button> <button type=\"button\" onclick=\"history.back()\" class=\"px-6 py-3 border border-zinc-700 rounded-xl hover:bg-zinc-800 transition\">Отмена</button></div></form></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</textarea></div><div><label class=\"block text-sm mb-1\">Постер (файл)</label> <input type=\"file\" name=\"poster\" accept=\"image/*\" class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 file:bg-zinc-700 file:border-0 file:rounded file:px-4 file:py-2 file:text-sm file:text-zinc-300\"><p class=\"text-xs text-zinc-500 mt-1\">JPG, PNG, WEBP, макс. 5 МБ</p></div><div class=\"flex gap-3 pt-4\"><button type=\"submit\" class=\"flex-1 bg-violet-600 hover:bg-violet-700 py-3 rounded-xl font-semibold transition\">Сохранить</button> <button type=\"button\" onclick=\"history.back()\" class=\"px-6 py-3 border border-zinc-700 rounded-xl hover:bg-zinc-800 transition\">Отмена</button></div></form></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
