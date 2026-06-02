@@ -250,12 +250,14 @@ func (h *EventHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	isFree := r.FormValue("is_free") == "on"
+	// Обработка типа мероприятия (платное/бесплатное)
+	eventType := r.FormValue("event_type")
 	price := 0
-	if !isFree {
+	if eventType != "free" {
 		p, _ := strconv.Atoi(r.FormValue("price"))
 		price = p
 	}
+
 	available, _ := strconv.Atoi(r.FormValue("available"))
 
 	var posterURL *string
@@ -286,6 +288,12 @@ func (h *EventHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Получаем статус из формы, если он есть
+	status := r.FormValue("status")
+	if status == "" {
+		status = "published" // Значение по умолчанию
+	}
+
 	event := &domain.Event{
 		ID:          id,
 		Title:       r.FormValue("title"),
@@ -295,7 +303,7 @@ func (h *EventHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 		Price:       price,
 		Available:   available,
 		PosterURL:   posterURL,
-		Status:      r.FormValue("status"),
+		Status:      status,
 	}
 
 	err = h.service.UpdateEventWithGenres(id, middleware.GetUserID(r), event, genreIDs)
