@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"voidsounds/internal/components"
 	"voidsounds/internal/domain"
@@ -34,8 +35,11 @@ func (h *AdminHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 		TotalTickets: h.calculateTotalTickets(events),
 	}
 
-	component := components.AdminDashboard(stats, users, events)
-	component.Render(r.Context(), w)
+	if r.Header.Get("HX-Request") == "true" {
+		components.AdminDashboardContent(stats, users, events).Render(r.Context(), w)
+	} else {
+		components.AdminDashboard(stats, users, events).Render(r.Context(), w)
+	}
 }
 
 // GET /admin/users - список пользователей
@@ -205,4 +209,68 @@ func (h *AdminHandler) calculateTotalTickets(events domain.Events) int {
 		total += e.Available
 	}
 	return total
+}
+
+// GET /admin/events/{id}/edit - форма редактирования
+func (h *AdminHandler) EditEventForm(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		components.ErrorMessage("Неверный ID").Render(r.Context(), w)
+		return
+	}
+
+	event, err := h.eventService.GetEventByIDForEdit(id)
+	if err != nil {
+		components.ErrorMessage("Мероприятие не найдено").Render(r.Context(), w)
+		return
+	}
+
+	event.Genres, _ = h.eventService.GetGenresByEventID(id)
+	genres, _ := h.eventService.GetAllGenres()
+
+	component := components.AdminEditEventForm(event, genres)
+	component.Render(r.Context(), w)
+}
+
+// POST /admin/events/{id}/update - обновление мероприятия
+func (h *AdminHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		components.ErrorMessage("Неверный ID").Render(r.Context(), w)
+		return
+	}
+
+	r.ParseMultipartForm(5 << 20)
+
+	dateStr := r.FormValue("date")
+	date, err := time.ParseInLocation("2006-01-02T15:04", dateStr, time.Local)
+	if err != nil {
+		components.ErrorMessage("Неверный формат даты").Render(r.Context(), w)
+		return
+	}
+
+	price, _ := strconv.Atoi(r.FormValue("price"))
+	available, _ := strconv.Atoi(r.FormValue("available"))
+
+	event := &domain.Event{
+		ID:          id,
+		Title:       r.FormValue("title"),
+		Description: r.FormValue("description"),
+		Date:        date,
+		Address:     r.FormValue("address"),
+		Price:       price,
+		Available:   available,
+		Status:      r.FormValue("status"),
+	}
+
+	err = h.eventService.UpdateEventAdmin(id, event)
+	if err != nil {
+		components.ErrorMessage(err.Error()).Render(r.Context(), w)
+		return
+	}
+
+	w.Header().Set("HX-Redirect", "/admin/events")
+	w.WriteHeader(http.StatusOK)
 }

@@ -184,3 +184,22 @@ func (s *EventService) GetAllEventsForAdmin() (domain.Events, error) {
 func (s *EventService) DeleteEventAdmin(eventID int) error {
 	return s.repo.Delete(eventID)
 }
+
+// UpdateEventAdmin - обновление мероприятия админом (без проверки владельца)
+func (s *EventService) UpdateEventAdmin(eventID int, req *domain.Event) error {
+	existing, err := s.repo.GetByID(eventID)
+	if err != nil {
+		return fmt.Errorf("мероприятие не найдено")
+	}
+
+	existing.Title = req.Title
+	existing.Description = req.Description
+	existing.Date = req.Date
+	existing.Address = req.Address
+	existing.Price = req.Price
+	existing.Available = req.Available
+	existing.PosterURL = req.PosterURL
+	existing.Status = req.Status
+
+	return s.repo.Update(existing)
+}
