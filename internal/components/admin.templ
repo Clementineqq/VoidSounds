@@ -9,53 +9,58 @@ type AdminStats struct {
 	TotalUsers   int
 	TotalEvents  int
 	TotalTickets int
-	  
 }
 
-// AdminDashboard - главная страница админки
+// AdminDashboard - главная страница админки (с Layout)
 templ AdminDashboard(stats AdminStats, users []domain.User, events domain.Events) {
 	@Layout("Админ-панель") {
-		<div class="max-w-7xl mx-auto px-6 py-10" id="main-content">
-			<h1 class="text-4xl font-bold mb-8">🔧 Админ-панель</h1>
-			
-// Статистика
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
-        <div class="text-zinc-400 text-sm mb-2">Всего пользователей</div>
-        <div class="text-3xl font-bold text-violet-400">{ stats.TotalUsers }</div>
-    </div>
-    <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
-        <div class="text-zinc-400 text-sm mb-2">Всего мероприятий</div>
-        <div class="text-3xl font-bold text-emerald-400">{ stats.TotalEvents }</div>
-    </div>
-    <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
-        <div class="text-zinc-400 text-sm mb-2">Всего билетов</div>
-        <div class="text-3xl font-bold text-blue-400">{ stats.TotalTickets }</div>
-    </div>
-</div>
-			
-			<!-- Быстрые ссылки -->
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-				<a href="/admin/users" 
-				   hx-get="/admin/users"
-				   hx-target="#main-content"
-				   hx-swap="innerHTML"
-				   class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-violet-500 transition">
-					<h2 class="text-xl font-semibold mb-2">👥 Пользователи</h2>
-					<p class="text-zinc-400">Управление пользователями и ролями</p>
-				</a>
-				<a href="/admin/events" 
-				   hx-get="/admin/events"
-				   hx-target="#main-content"
-				   hx-swap="innerHTML"
-				   class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-violet-500 transition">
-					<h2 class="text-xl font-semibold mb-2">🎪 Мероприятия</h2>
-					<p class="text-zinc-400">Модерация и управление событиями</p>
-				</a>
-			</div>
-		</div>
+		@AdminDashboardContent(stats, users, events)
 	}
 }
+
+// AdminDashboardContent - только контент для HTMX
+templ AdminDashboardContent(stats AdminStats, users []domain.User, events domain.Events) {
+	<div class="max-w-7xl mx-auto px-6 py-10" id="main-content">
+		<h1 class="text-4xl font-bold mb-8">🔧 Админ-панель</h1>
+		
+		<!-- Статистика -->
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+			<div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
+				<div class="text-zinc-400 text-sm mb-2">Всего пользователей</div>
+				<div class="text-3xl font-bold text-violet-400">{ stats.TotalUsers }</div>
+			</div>
+			<div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
+				<div class="text-zinc-400 text-sm mb-2">Всего мероприятий</div>
+				<div class="text-3xl font-bold text-emerald-400">{ stats.TotalEvents }</div>
+			</div>
+			<div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
+				<div class="text-zinc-400 text-sm mb-2">Всего билетов</div>
+				<div class="text-3xl font-bold text-blue-400">{ stats.TotalTickets }</div>
+			</div>
+		</div>
+		
+		<!-- Быстрые ссылки -->
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+			<a href="/admin/users" 
+			   hx-get="/admin/users"
+			   hx-target="#main-content"
+			   hx-swap="innerHTML"
+			   class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-violet-500 transition">
+				<h2 class="text-xl font-semibold mb-2">👥 Пользователи</h2>
+				<p class="text-zinc-400">Управление пользователями и ролями</p>
+			</a>
+			<a href="/admin/events" 
+			   hx-get="/admin/events"
+			   hx-target="#main-content"
+			   hx-swap="innerHTML"
+			   class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-violet-500 transition">
+				<h2 class="text-xl font-semibold mb-2">🎪 Мероприятия</h2>
+				<p class="text-zinc-400">Модерация и управление событиями</p>
+			</a>
+		</div>
+	</div>
+}
+
 // AdminUsersPage - полная страница пользователей с Layout
 templ AdminUsersPage(users []domain.User) {
 	@Layout("Пользователи") {
@@ -69,6 +74,7 @@ templ AdminEventsPage(events domain.Events) {
 		@AdminEventsList(events)
 	}
 }
+
 // AdminUsersList - список пользователей
 templ AdminUsersList(users []domain.User) {
 	<div class="max-w-7xl mx-auto px-6 py-10" id="main-content">
@@ -235,6 +241,16 @@ templ AdminEventsList(events domain.Events) {
 								</span>
 							</td>
 							<td class="px-6 py-4 text-sm space-x-2">
+								<!-- Кнопка редактирования -->
+								<a href={"/admin/events/" + strconv.Itoa(event.ID) + "/edit"}
+								   hx-get={"/admin/events/" + strconv.Itoa(event.ID) + "/edit"}
+								   hx-target="#main-content"
+								   hx-swap="innerHTML"
+								   class="text-blue-400 hover:text-blue-300">
+									✏️
+								</a>
+								
+								<!-- Смена статуса -->
 								<form hx-post={"/admin/events/" + strconv.Itoa(event.ID) + "/status"}
 								      hx-target="#main-content"
 								      hx-swap="innerHTML"
@@ -245,6 +261,8 @@ templ AdminEventsList(events domain.Events) {
 										<option value="cancelled" { selectedIf(event.Status == "cancelled") }>Отменено</option>
 									</select>
 								</form>
+								
+								<!-- Удаление -->
 								<button hx-delete={"/admin/events/" + strconv.Itoa(event.ID)}
 								        hx-target="#main-content"
 								        hx-swap="innerHTML"
@@ -258,6 +276,86 @@ templ AdminEventsList(events domain.Events) {
 				</tbody>
 			</table>
 		</div>
+	</div>
+}
+
+// AdminEditEventForm - форма редактирования мероприятия
+templ AdminEditEventForm(event *domain.Event, genres []domain.Genre) {
+	<div class="max-w-4xl mx-auto px-6 py-10" id="main-content">
+		<div class="flex justify-between items-center mb-8">
+			<h1 class="text-3xl font-bold">✏️ Редактирование мероприятия</h1>
+			<a href="/admin/events" 
+			   hx-get="/admin/events"
+			   hx-target="#main-content"
+			   hx-swap="innerHTML"
+			   class="text-zinc-400 hover:text-violet-400 transition">
+				← Назад
+			</a>
+		</div>
+		
+		<form hx-post={"/admin/events/" + strconv.Itoa(event.ID) + "/update"}
+		      hx-target="#main-content"
+		      hx-swap="innerHTML"
+		      enctype="multipart/form-data"
+		      class="bg-zinc-900 rounded-2xl border border-zinc-800 p-6 space-y-4">
+			<input type="hidden" name="_method" value="PUT" />
+			
+			<div>
+				<label class="block text-sm mb-1">Название</label>
+				<input type="text" name="title" value={ event.Title } required
+				       class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
+			</div>
+			
+			<div>
+				<label class="block text-sm mb-1">Описание</label>
+				<textarea name="description" rows="3" required
+				          class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">{ event.Description }</textarea>
+			</div>
+			
+			<div class="grid grid-cols-2 gap-4">
+				<div>
+					<label class="block text-sm mb-1">Дата и время</label>
+					<input type="datetime-local" name="date" value={ event.Date.Format("2006-01-02T15:04") } required
+					       class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
+				</div>
+				<div>
+					<label class="block text-sm mb-1">Место</label>
+					<input type="text" name="address" value={ event.Address } required
+					       class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
+				</div>
+			</div>
+			
+			<div class="grid grid-cols-2 gap-4">
+				<div>
+					<label class="block text-sm mb-1">Цена (₽)</label>
+					<input type="number" name="price" value={ event.Price } min="0"
+					       class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
+				</div>
+				<div>
+					<label class="block text-sm mb-1">Количество мест</label>
+					<input type="number" name="available" value={ event.Available } min="0" required
+					       class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
+				</div>
+			</div>
+			
+			<div>
+				<label class="block text-sm mb-1">Статус</label>
+				<select name="status" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2">
+					<option value="published" { selectedIf(event.Status == "published") }>Активно</option>
+					<option value="draft" { selectedIf(event.Status == "draft") }>Черновик</option>
+					<option value="cancelled" { selectedIf(event.Status == "cancelled") }>Отменено</option>
+				</select>
+			</div>
+			
+			<div class="flex gap-3 pt-4">
+				<button type="submit" class="flex-1 bg-violet-600 hover:bg-violet-700 py-3 rounded-xl font-semibold transition">
+					Сохранить
+				</button>
+				<button type="button" onclick="history.back()" class="px-6 py-3 border border-zinc-700 rounded-xl hover:bg-zinc-800 transition">
+					Отмена
+				</button>
+			</div>
+		</form>
 	</div>
 }
 
@@ -284,6 +382,8 @@ func roleLabel(role string) string {
 	}
 }
 
+
+
 func statusLabel(status string) string {
 	switch status {
 	case "published":
@@ -296,3 +396,4 @@ func statusLabel(status string) string {
 		return status
 	}
 }
+

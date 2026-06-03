@@ -35,8 +35,16 @@ func posterVal(ev *domain.Event) string {
 	return ""
 }
 func statusClass(status string) string {
-	if status == "published" { return "bg-emerald-500/20 text-emerald-400" }
-	return "bg-yellow-500/20 text-yellow-400"
+	switch status {
+	case "published":
+		return "bg-emerald-500/20 text-emerald-400"
+	case "draft":
+		return "bg-yellow-500/20 text-yellow-400"
+	case "cancelled":
+		return "bg-red-500/20 text-red-400"
+	default:
+		return "bg-zinc-700 text-zinc-300"
+	}
 }
 func selectedIf(condition bool) string {
 	if condition { return "selected" }

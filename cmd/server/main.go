@@ -83,7 +83,7 @@ func main() {
 		r.Post("/organizer/events/{id}/update", eventHandler.UpdateEvent)
 	})
 
-	// Админка (только для роли admin) - ВСЕ МАРШРУТЫ В ОДНОМ МЕСТЕ
+	// Админка
 	r.Group(func(r chi.Router) {
 		r.Use(mymw.RequireAuth, mymw.RequireRole("admin"))
 		r.Get("/admin", adminHandler.Dashboard)
@@ -92,6 +92,8 @@ func main() {
 		r.Post("/admin/users/{id}/role", adminHandler.ChangeUserRole)
 		r.Post("/admin/users/{id}/ban", adminHandler.BanUser)
 		r.Get("/admin/events", adminHandler.GetEvents)
+		r.Get("/admin/events/{id}/edit", adminHandler.EditEventForm)
+		r.Post("/admin/events/{id}/update", adminHandler.UpdateEvent)
 		r.Post("/admin/events/{id}/status", adminHandler.ChangeEventStatus)
 		r.Delete("/admin/events/{id}", adminHandler.DeleteEvent)
 	})
