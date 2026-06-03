@@ -337,7 +337,17 @@ templ AdminEditEventForm(event *domain.Event, genres []domain.Genre) {
 					       class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none">
 				</div>
 			</div>
-			
+			<div>
+    <label class="block text-sm mb-1">Постер</label>
+    <input type="file" name="poster" accept="image/*"
+           class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 file:bg-zinc-700 file:border-0 file:rounded file:px-4 file:py-2 file:text-sm file:text-zinc-300">
+    <p class="text-xs text-zinc-500 mt-1">Оставьте пустым, чтобы не менять</p>
+    if event.PosterURL != nil && *event.PosterURL != "" {
+        <div class="mt-2">
+            <img src={ *event.PosterURL } alt="Текущий постер" class="h-32 rounded-lg object-cover">
+        </div>
+    }
+</div>
 			<div>
 				<label class="block text-sm mb-1">Статус</label>
 				<select name="status" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2">

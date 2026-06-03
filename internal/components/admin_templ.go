@@ -914,46 +914,69 @@ func AdminEditEventForm(event *domain.Event, genres []domain.Genre) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "\" min=\"0\" required class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none\"></div></div><div><label class=\"block text-sm mb-1\">Статус</label> <select name=\"status\" class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2\"><option value=\"published\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "\" min=\"0\" required class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:border-violet-500 outline-none\"></div></div><div><label class=\"block text-sm mb-1\">Постер</label> <input type=\"file\" name=\"poster\" accept=\"image/*\" class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 file:bg-zinc-700 file:border-0 file:rounded file:px-4 file:py-2 file:text-sm file:text-zinc-300\"><p class=\"text-xs text-zinc-500 mt-1\">Оставьте пустым, чтобы не менять</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var57 string
-		templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.JoinStringErrs(selectedIf(event.Status == "published"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/admin.templ`, Line: 344, Col: 72}
+		if event.PosterURL != nil && *event.PosterURL != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<div class=\"mt-2\"><img src=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var57 string
+			templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.JoinStringErrs(*event.PosterURL)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/admin.templ`, Line: 347, Col: 39}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var57))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "\" alt=\"Текущий постер\" class=\"h-32 rounded-lg object-cover\"></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(` ` + templ_7745c5c3_Var57))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, ">Активно</option> <option value=\"draft\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "</div><div><label class=\"block text-sm mb-1\">Статус</label> <select name=\"status\" class=\"w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2\"><option value=\"published\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var58 string
-		templ_7745c5c3_Var58, templ_7745c5c3_Err = templ.JoinStringErrs(selectedIf(event.Status == "draft"))
+		templ_7745c5c3_Var58, templ_7745c5c3_Err = templ.JoinStringErrs(selectedIf(event.Status == "published"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/admin.templ`, Line: 345, Col: 64}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/admin.templ`, Line: 354, Col: 72}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(` ` + templ_7745c5c3_Var58))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, ">Черновик</option> <option value=\"cancelled\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, ">Активно</option> <option value=\"draft\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var59 string
-		templ_7745c5c3_Var59, templ_7745c5c3_Err = templ.JoinStringErrs(selectedIf(event.Status == "cancelled"))
+		templ_7745c5c3_Var59, templ_7745c5c3_Err = templ.JoinStringErrs(selectedIf(event.Status == "draft"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/admin.templ`, Line: 346, Col: 72}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/admin.templ`, Line: 355, Col: 64}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(` ` + templ_7745c5c3_Var59))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, ">Отменено</option></select></div><div class=\"flex gap-3 pt-4\"><button type=\"submit\" class=\"flex-1 bg-violet-600 hover:bg-violet-700 py-3 rounded-xl font-semibold transition\">Сохранить</button> <button type=\"button\" onclick=\"history.back()\" class=\"px-6 py-3 border border-zinc-700 rounded-xl hover:bg-zinc-800 transition\">Отмена</button></div></form></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, ">Черновик</option> <option value=\"cancelled\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var60 string
+		templ_7745c5c3_Var60, templ_7745c5c3_Err = templ.JoinStringErrs(selectedIf(event.Status == "cancelled"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/admin.templ`, Line: 356, Col: 72}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(` ` + templ_7745c5c3_Var60))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, ">Отменено</option></select></div><div class=\"flex gap-3 pt-4\"><button type=\"submit\" class=\"flex-1 bg-violet-600 hover:bg-violet-700 py-3 rounded-xl font-semibold transition\">Сохранить</button> <button type=\"button\" onclick=\"history.back()\" class=\"px-6 py-3 border border-zinc-700 rounded-xl hover:bg-zinc-800 transition\">Отмена</button></div></form></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
