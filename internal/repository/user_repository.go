@@ -9,6 +9,9 @@ type UserRepository interface {
 	Create(user *domain.User) error
 	GetByEmail(email string) (*domain.User, error)
 	GetByID(id int) (*domain.User, error)
+	GetAllUsers() ([]domain.User, error)          // ← ДОБАВИТЬ
+	ChangeUserRole(userID int, role string) error // ← ДОБАВИТЬ
+	BanUser(userID int) error                     // ← ДОБАВИТЬ
 }
 
 type userRepository struct{}
@@ -81,4 +84,54 @@ func (r *userRepository) GetByID(id int) (*domain.User, error) {
 	}
 
 	return &user, nil
+}
+
+// GetAllUsers - получить всех пользователей
+func (r *userRepository) GetAllUsers() ([]domain.User, error) {
+	if DB == nil {
+		return []domain.User{}, nil
+	}
+	query := `SELECT id, email, name, role, created_at FROM users ORDER BY created_at DESC`
+	var users []domain.User
+	err := DB.Select(&users, query)
+	if err != nil {
+		return nil, fmt.Errorf("ошибка получения пользователей: %w", err)
+	}
+	return users, nil
+}
+
+// ChangeUserRole - сменить роль пользователя
+func (r *userRepository) ChangeUserRole(userID int, role string) error {
+	if DB == nil {
+		return fmt.Errorf("база данных не подключена")
+	}
+	query := `UPDATE users SET role = $1 WHERE id = $2`
+	result, err := DB.Exec(query, role, userID)
+	if err != nil {
+		return fmt.Errorf("ошибка смены роли: %w", err)
+	}
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return fmt.Errorf("пользователь не найден")
+	}
+	return nil
+}
+
+func (r *userRepository) BanUser(userID int) error {
+	if DB == nil {
+		return fmt.Errorf("база данных не подключена")
+	}
+
+	var isBanned bool
+	err := DB.Get(&isBanned, `SELECT is_banned FROM users WHERE id = $1`, userID)
+	if err != nil {
+		return fmt.Errorf("пользователь не найден: %w", err)
+	}
+
+	query := `UPDATE users SET is_banned = $1 WHERE id = $2`
+	_, err = DB.Exec(query, !isBanned, userID)
+	if err != nil {
+		return fmt.Errorf("ошибка бана: %w", err)
+	}
+	return nil
 }

@@ -55,3 +55,7 @@ CREATE TABLE IF NOT EXISTS tickets (
 CREATE INDEX IF NOT EXISTS idx_events_date ON events(date);
 CREATE INDEX IF NOT EXISTS idx_events_city_id ON events(city_id);
 CREATE INDEX IF NOT EXISTS idx_events_status ON events(status);
+
+
+
+ALTER TABLE users ADD COLUMN is_banned BOOLEAN DEFAULT FALSE;
