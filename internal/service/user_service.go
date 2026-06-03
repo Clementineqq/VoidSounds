@@ -96,3 +96,18 @@ func isValidEmail(email string) bool {
 	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$`)
 	return emailRegex.MatchString(strings.ToLower(email))
 }
+
+// GetAllUsers - получить всех пользователей
+func (s *UserService) GetAllUsers() ([]domain.User, error) {
+	return s.repo.GetAllUsers()
+}
+
+// ChangeUserRole - сменить роль пользователя
+func (s *UserService) ChangeUserRole(userID int, role string) error {
+	return s.repo.ChangeUserRole(userID, role)
+}
+
+// BanUser - забанить/разбанить пользователя
+func (s *UserService) BanUser(userID int) error {
+	return s.repo.BanUser(userID)
+}

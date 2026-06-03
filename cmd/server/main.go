@@ -9,13 +9,12 @@ import (
 
 	"voidsounds/internal/config"
 	"voidsounds/internal/handler"
-	mymw "voidsounds/internal/middleware" // alias чтобы не конфликтовало с chi/middleware
+	mymw "voidsounds/internal/middleware"
 	"voidsounds/internal/repository"
 	"voidsounds/internal/service"
 )
 
 func main() {
-
 	// 1. Загружаем конфигурацию
 	cfg := config.Load()
 
@@ -24,6 +23,7 @@ func main() {
 
 	// 3. Инициализируем сессии
 	mymw.InitSessionStore(cfg.SessionSecret)
+
 	// 4. Инициализируем репозитории
 	eventRepo := repository.NewEventRepository()
 	userRepo := repository.NewUserRepository()
@@ -36,6 +36,8 @@ func main() {
 	eventHandler := handler.NewEventHandler(eventService, userService)
 	authHandler := handler.NewAuthHandler(userService)
 	adminHandler := handler.NewAdminHandler(eventService, userService)
+	pageHandler := handler.NewPageHandler()
+
 	// 7. Настраиваем роутер
 	r := chi.NewRouter()
 
@@ -80,23 +82,28 @@ func main() {
 		r.Get("/organizer/events/{id}/edit", eventHandler.ShowEditForm)
 		r.Post("/organizer/events/{id}/update", eventHandler.UpdateEvent)
 	})
-	// Админка (только для роли admin)
+
+	// Админка (только для роли admin) - ВСЕ МАРШРУТЫ В ОДНОМ МЕСТЕ
 	r.Group(func(r chi.Router) {
 		r.Use(mymw.RequireAuth, mymw.RequireRole("admin"))
 		r.Get("/admin", adminHandler.Dashboard)
+		r.Get("/admin/users", adminHandler.GetUsers)
+		r.Get("/admin/users/{id}", adminHandler.GetUserByID)
+		r.Post("/admin/users/{id}/role", adminHandler.ChangeUserRole)
+		r.Post("/admin/users/{id}/ban", adminHandler.BanUser)
+		r.Get("/admin/events", adminHandler.GetEvents)
+		r.Post("/admin/events/{id}/status", adminHandler.ChangeEventStatus)
+		r.Delete("/admin/events/{id}", adminHandler.DeleteEvent)
 	})
-
-	// Инициализация хендлера страниц
-	pageHandler := handler.NewPageHandler()
-
-	r.Get("/organizer/{id}", eventHandler.ShowOrganizerProfile)
 
 	// Публичные информационные страницы
 	r.Get("/for-organizers", pageHandler.ForOrganizers)
+	r.Get("/organizer/{id}", eventHandler.ShowOrganizerProfile)
 
-	log.Printf("VoidSounds запущен на http://localhost:%s", cfg.ServerPort)
 	// Раздача загруженных файлов
 	fs := http.FileServer(http.Dir("static"))
 	r.Handle("/static/*", http.StripPrefix("/static/", fs))
+
+	log.Printf("VoidSounds запущен на http://localhost:%s", cfg.ServerPort)
 	log.Fatal(http.ListenAndServe(":"+cfg.ServerPort, r))
 }

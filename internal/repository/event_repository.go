@@ -20,6 +20,7 @@ type EventRepository interface {
 	GetAllWithFilters(citySlug, genreSlug, search string) (domain.Events, error)
 	GetGenresByEventID(eventID int) ([]domain.Genre, error)
 	AssignGenresToEvent(eventID int, genreIDs []int) error
+	GetAllEventsForAdmin() (domain.Events, error) // ← ДОБАВИТЬ
 }
 
 type eventRepository struct{}
@@ -276,7 +277,26 @@ func (r *eventRepository) AssignGenresToEvent(eventID int, genreIDs []int) error
 
 func getMockEvents() domain.Events {
 	return domain.Events{
-		{ID: 1, Title: "Шум и Выходки в баре «Подвал»", Description: "Сольный концерт группы Шум и Выходки. Nintendo-core, чиптюн, эксперименты.", Date: time.Date(2026, 5, 15, 20, 0, 0, 0, time.Local), Address: "Бар «Подвал», Мытищи", Price: 800, Available: 87, Status: "published", OrganizerID: 1},
-		{ID: 2, Title: "Mitski", Description: "Лютый Арт перфоманс Митски в нашем доме!", Date: time.Date(2026, 5, 9, 22, 0, 0, 0, time.Local), Address: "квартира жинки любимой, где-то в Самаре", Price: 9999, Available: 0, Status: "published", OrganizerID: 1},
+		{ID: 1, Title: "Шум и Выходки в баре «Подвал»", Description: "Сольный концерт группы Шум и Выходки. Nintendo-core, чиптюн, эксперименты.", Date: time.Date(2026, 5, 15, 20, 0, 0, 0, time.Local), Address: "Самара, Бар Подвал", Price: 800, Available: 87, Status: "published", OrganizerID: 1},
+		{ID: 2, Title: "Mitski", Description: "Лютый Арт перфоманс Митски в нашем доме!", Date: time.Date(2026, 5, 9, 22, 0, 0, 0, time.Local), Address: "Самара, Бар Подвал", Price: 9999, Available: 0, Status: "published", OrganizerID: 1},
 	}
+}
+
+func (r *eventRepository) GetAllEventsForAdmin() (domain.Events, error) {
+	if DB == nil {
+		return getMockEvents(), nil
+	}
+	query := `SELECT e.id, e.title, e.description, e.date, e.city_id, e.address, 
+                     e.price, e.available, e.poster_url, e.organizer_id, e.status, 
+                     e.created_at, e.updated_at,
+                     u.name as organizer_name
+              FROM events e 
+              LEFT JOIN users u ON e.organizer_id = u.id 
+              ORDER BY e.date DESC`
+	var events domain.Events
+	err := DB.Select(&events, query)
+	if err != nil {
+		return nil, fmt.Errorf("ошибка получения всех событий: %w", err)
+	}
+	return events, nil
 }

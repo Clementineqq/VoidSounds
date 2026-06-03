@@ -174,3 +174,13 @@ func (s *EventService) GetGenresByEventID(eventID int) ([]domain.Genre, error) {
 func (s *EventService) GetEventsByOrganizer(organizerID int) (domain.Events, error) {
 	return s.repo.GetByOrganizerID(organizerID)
 }
+
+// GetAllEventsForAdmin - получить все мероприятия (для админа, без фильтра по статусу)
+func (s *EventService) GetAllEventsForAdmin() (domain.Events, error) {
+	return s.repo.GetAllEventsForAdmin()
+}
+
+// DeleteEventAdmin - удаление мероприятия админом (без проверки владельца)
+func (s *EventService) DeleteEventAdmin(eventID int) error {
+	return s.repo.Delete(eventID)
+}
