@@ -1,8 +1,13 @@
 package handler
 
 import (
+	"fmt"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"voidsounds/internal/components"
@@ -242,6 +247,13 @@ func (h *AdminHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Получаем существующее мероприятие
+	existingEvent, err := h.eventService.GetEventByIDForEdit(id)
+	if err != nil {
+		components.ErrorMessage("Мероприятие не найдено").Render(r.Context(), w)
+		return
+	}
+
 	r.ParseMultipartForm(5 << 20)
 
 	dateStr := r.FormValue("date")
@@ -254,6 +266,29 @@ func (h *AdminHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	price, _ := strconv.Atoi(r.FormValue("price"))
 	available, _ := strconv.Atoi(r.FormValue("available"))
 
+	// Начинаем с существующего постера
+	posterURL := existingEvent.PosterURL
+
+	// Проверяем, загружен ли новый файл
+	file, header, err := r.FormFile("poster")
+	if err == nil && file != nil {
+		defer file.Close()
+		ext := strings.ToLower(filepath.Ext(header.Filename))
+		if ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".webp" {
+			os.MkdirAll("static/uploads", 0755)
+			safeName := strings.ReplaceAll(r.FormValue("title"), " ", "_")
+			filename := fmt.Sprintf("%d_%s%s", time.Now().UnixNano(), safeName, ext)
+			path := filepath.Join("static/uploads", filename)
+			out, err := os.Create(path)
+			if err == nil {
+				defer out.Close()
+				io.Copy(out, file)
+				url := "/static/uploads/" + strings.ReplaceAll(filename, "\\", "/")
+				posterURL = &url
+			}
+		}
+	}
+
 	event := &domain.Event{
 		ID:          id,
 		Title:       r.FormValue("title"),
@@ -262,6 +297,7 @@ func (h *AdminHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 		Address:     r.FormValue("address"),
 		Price:       price,
 		Available:   available,
+		PosterURL:   posterURL, // Используем существующий или новый постер
 		Status:      r.FormValue("status"),
 	}
 

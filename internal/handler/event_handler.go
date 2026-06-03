@@ -264,7 +264,17 @@ func (h *EventHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 
 	available, _ := strconv.Atoi(r.FormValue("available"))
 
-	var posterURL *string
+	// Получаем существующее мероприятие для сохранения старого постера
+	existingEvent, err := h.service.GetEventByIDForEdit(id)
+	if err != nil {
+		components.ErrorMessage("Мероприятие не найдено").Render(r.Context(), w)
+		return
+	}
+
+	// Начинаем с существующего постера
+	posterURL := existingEvent.PosterURL
+
+	// Проверяем, загружен ли новый файл
 	file, header, err := r.FormFile("poster")
 	if err == nil && file != nil {
 		defer file.Close()
@@ -279,7 +289,7 @@ func (h *EventHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 				defer out.Close()
 				io.Copy(out, file)
 				url := "/static/uploads/" + strings.ReplaceAll(filename, "\\", "/")
-				posterURL = &url
+				posterURL = &url // Обновляем только если файл загрузился
 			}
 		}
 	}
