@@ -1,6 +1,6 @@
 package components
 
-// Форма регистрации (полная страница с Layout)
+// регистрация полная страница с Layout 
 templ RegisterForm() {
     @Layout("Регистрация") {
         <div class="max-w-md mx-auto px-6 py-10" id="main-content">
@@ -48,7 +48,7 @@ templ RegisterForm() {
     }
 }
 
-// Форма входа (полная страница с Layout)
+// вход полная страница с Layout 
 templ LoginForm() {
     @Layout("Вход") {
         <div class="max-w-md mx-auto px-6 py-10" id="main-content">
@@ -82,7 +82,7 @@ templ LoginForm() {
     }
 }
 
-// Сообщение об успешной регистрации/входе (только контент, без Layout, т.к. HTMX подгружает)
+// успешная регистрация/входя (без Layout)
 templ AuthSuccess(message string, redirectURL string) {
     <div class="max-w-md mx-auto px-6 py-10 text-center" id="main-content">
         <div class="bg-emerald-500/10 border border-emerald-500 rounded-2xl p-8">
@@ -97,7 +97,7 @@ templ AuthSuccess(message string, redirectURL string) {
     </div>
 }
 
-// Ошибка (только контент, без Layout)
+//  без Layout 
 templ ErrorMessage(message string) {
     <div class="max-w-md mx-auto px-6 py-10 text-center" id="main-content">
         <div class="bg-red-500/10 border border-red-500 rounded-2xl p-8">

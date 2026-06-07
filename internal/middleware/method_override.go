@@ -2,7 +2,7 @@ package middleware
 
 import "net/http"
 
-// MethodOverride позволяет использовать POST с _method=PUT/DELETE
+// использовать POST с _method=PUT/DELETE, шобы из формы редачить
 func MethodOverride(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "POST" {

@@ -15,47 +15,35 @@ import (
 )
 
 func main() {
-	// 1. Загружаем конфигурацию
 	cfg := config.Load()
 
-	// 2. Подключаемся к базе данных
 	repository.InitDB(cfg)
 
-	// 3. Инициализируем сессии
 	mymw.InitSessionStore(cfg.SessionSecret)
 
-	// 4. Инициализируем репозитории
 	eventRepo := repository.NewEventRepository()
 	userRepo := repository.NewUserRepository()
 
-	// 5. Инициализируем сервисы
 	eventService := service.NewEventService(eventRepo)
 	userService := service.NewUserService(userRepo)
 
-	// 6. Инициализируем хендлеры
 	eventHandler := handler.NewEventHandler(eventService, userService)
 	authHandler := handler.NewAuthHandler(userService)
 	adminHandler := handler.NewAdminHandler(eventService, userService)
 	pageHandler := handler.NewPageHandler()
 
-	// 7. Настраиваем роутер
 	r := chi.NewRouter()
 
-	// Middleware
 	r.Use(mymw.MethodOverride)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.RequestID)
 	r.Use(mymw.AuthMiddleware)
 
-	// 8. Регистрируем маршруты
-
-	// Публичные маршруты
 	r.Get("/", eventHandler.Home)
 	r.Get("/events", eventHandler.GetAllEvents)
 	r.Get("/event/{id}", eventHandler.GetEventByID)
 
-	// Маршруты авторизации
 	r.Get("/register", authHandler.ShowRegister)
 	r.Post("/register", authHandler.Register)
 	r.Get("/login", authHandler.ShowLogin)
@@ -63,7 +51,6 @@ func main() {
 	r.Post("/logout", authHandler.Logout)
 	r.Get("/auth/status", authHandler.GetAuthStatus)
 
-	// Защищённые маршруты (только для авторизованных)
 	r.Group(func(r chi.Router) {
 		r.Use(mymw.RequireAuth)
 		r.Post("/event/{id}/buy", eventHandler.BuyTicket)
@@ -71,7 +58,6 @@ func main() {
 		r.Get("/ticket/{id}/qr", eventHandler.TicketQR)
 	})
 
-	// Маршруты организатора (авторизация + роль organizer)
 	r.Group(func(r chi.Router) {
 		r.Use(mymw.RequireAuth, mymw.RequireRole("organizer"))
 		r.Post("/organizer/events/{id}/status", eventHandler.ChangeStatus)
@@ -83,7 +69,6 @@ func main() {
 		r.Post("/organizer/events/{id}/update", eventHandler.UpdateEvent)
 	})
 
-	// Админка
 	r.Group(func(r chi.Router) {
 		r.Use(mymw.RequireAuth, mymw.RequireRole("admin"))
 		r.Get("/admin", adminHandler.Dashboard)
@@ -98,11 +83,9 @@ func main() {
 		r.Delete("/admin/events/{id}", adminHandler.DeleteEvent)
 	})
 
-	// Публичные информационные страницы
 	r.Get("/for-organizers", pageHandler.ForOrganizers)
 	r.Get("/organizer/{id}", eventHandler.ShowOrganizerProfile)
 
-	// Раздача загруженных файлов
 	fs := http.FileServer(http.Dir("static"))
 	r.Handle("/static/*", http.StripPrefix("/static/", fs))
 

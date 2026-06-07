@@ -1,23 +1,10 @@
-INSERT INTO users (email, password_hash, name, role)
-VALUES ('organizer@test.ru', '$2a$10$dummyhash', 'тестовый оОрганизатор', 'organizer')
-ON CONFLICT (email) DO NOTHING;
 
 
 
 
 
 
--- Сначала удали старого админа (если есть)
-DELETE FROM users WHERE email = 'admin@voidsounds.ru';
 
--- Вставь с правильным хешем пароля 'admin123'
-INSERT INTO users (email, password_hash, name, role)
-VALUES (
-    'admin@voidsounds.ru',
-    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
-    'Администратор',
-    'admin'
-);
 -- DELETE FROM EVENTS
 -- WHERE TITLE = 'Шум и Выходки в баре «Подвал»'
 

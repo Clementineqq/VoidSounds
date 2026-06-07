@@ -11,14 +11,14 @@ type AdminStats struct {
 	TotalTickets int
 }
 
-// AdminDashboard - главная страница админки (с Layout)
+//  лавная страница админки с Layout 
 templ AdminDashboard(stats AdminStats, users []domain.User, events domain.Events) {
 	@Layout("Админ-панель") {
 		@AdminDashboardContent(stats, users, events)
 	}
 }
 
-// AdminDashboardContent - только контент для HTMX
+//  только контент для HTMX
 templ AdminDashboardContent(stats AdminStats, users []domain.User, events domain.Events) {
 	<div class="max-w-7xl mx-auto px-6 py-10" id="main-content">
 		<h1 class="text-4xl font-bold mb-8">🔧 Админ-панель</h1>
@@ -39,7 +39,7 @@ templ AdminDashboardContent(stats AdminStats, users []domain.User, events domain
 			</div>
 		</div>
 		
-		<!-- Быстрые ссылки -->
+	 
 		<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 			<a href="/admin/users" 
 			   hx-get="/admin/users"
@@ -61,21 +61,21 @@ templ AdminDashboardContent(stats AdminStats, users []domain.User, events domain
 	</div>
 }
 
-// AdminUsersPage - полная страница пользователей с Layout
+//  полная страница пользователей с Layout
 templ AdminUsersPage(users []domain.User) {
 	@Layout("Пользователи") {
 		@AdminUsersList(users)
 	}
 }
 
-// AdminEventsPage - полная страница мероприятий с Layout
+//  полная страница мероприятий с Layout
 templ AdminEventsPage(events domain.Events) {
 	@Layout("Мероприятия") {
 		@AdminEventsList(events)
 	}
 }
 
-// AdminUsersList - список пользователей
+//  список пользователей
 templ AdminUsersList(users []domain.User) {
 	<div class="max-w-7xl mx-auto px-6 py-10" id="main-content">
 		<div class="flex justify-between items-center mb-8">
@@ -130,7 +130,7 @@ templ AdminUsersList(users []domain.User) {
 	</div>
 }
 
-// AdminUserDetail - детальная информация о пользователе
+//  детальная информация о юзере
 templ AdminUserDetail(user *domain.User, events domain.Events, tickets []domain.Ticket) {
 	@Layout(user.Name) {
 		<div class="max-w-4xl mx-auto px-6 py-10" id="main-content">
@@ -174,7 +174,7 @@ templ AdminUserDetail(user *domain.User, events domain.Events, tickets []domain.
 					</div>
 				</div>
 				
-				<!-- Смена роли -->
+			 
 				<div class="mt-6 pt-6 border-t border-zinc-800">
 					<h3 class="text-lg font-semibold mb-3">Сменить роль</h3>
 					<form hx-post={"/admin/users/" + strconv.Itoa(user.ID) + "/role"}
@@ -196,7 +196,7 @@ templ AdminUserDetail(user *domain.User, events domain.Events, tickets []domain.
 	}
 }
 
-// AdminEventsList - список мероприятий
+// список мероприятий
 templ AdminEventsList(events domain.Events) {
 	<div class="max-w-7xl mx-auto px-6 py-10" id="main-content">
 		<div class="flex justify-between items-center mb-8">
@@ -262,7 +262,7 @@ templ AdminEventsList(events domain.Events) {
 									</select>
 								</form>
 								
-								<!-- Удаление -->
+							 
 								<button hx-delete={"/admin/events/" + strconv.Itoa(event.ID)}
 								        hx-target="#main-content"
 								        hx-swap="innerHTML"
@@ -279,7 +279,7 @@ templ AdminEventsList(events domain.Events) {
 	</div>
 }
 
-// AdminEditEventForm - форма редактирования мероприятия
+// редактирования мероприятия
 templ AdminEditEventForm(event *domain.Event, genres []domain.Genre) {
 	<div class="max-w-4xl mx-auto px-6 py-10" id="main-content">
 		<div class="flex justify-between items-center mb-8">
@@ -369,8 +369,7 @@ templ AdminEditEventForm(event *domain.Event, genres []domain.Genre) {
 	</div>
 }
 
-// Вспомогательные функции
-func roleClass(role string) string {
+ func roleClass(role string) string {
 	switch role {
 	case "admin":
 		return "bg-red-500/20 text-red-400"
