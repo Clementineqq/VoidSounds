@@ -1,0 +1,54 @@
+package components
+
+templ Layout(title string) {
+    <!DOCTYPE html>
+    <html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{ title } — VoidSounds</title>
+        
+       <script src="https://unpkg.com/htmx.org@2/dist/htmx.min.js"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+        
+        <style>
+            .line-clamp-3 {
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+    <body class="bg-zinc-950 text-zinc-100">
+        <!-- Navbar -->
+        <nav class="border-b border-zinc-800 bg-zinc-900">
+            <div class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+                <div class="flex items-center gap-8">
+                    <a href="/" class="text-2xl font-bold tracking-tighter text-white">
+                        VoidSounds
+                    </a>
+                    
+                    <div class="hidden md:flex items-center gap-6 text-sm">
+                        <a href="/events" class="hover:text-violet-400 transition">Мероприятия</a>
+                        <a href="/for-organizers" class="hover:text-violet-400 transition">Для организаторов</a>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-4" id="auth-buttons">
+                    <div hx-get="/auth/status" hx-trigger="load, every 60s" hx-swap="innerHTML">
+                        <!-- Заглушка -->
+                        <button class="px-5 py-2 text-sm font-medium hover:text-violet-400 transition">
+                            Войти
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        
+        <main>
+            { children... }
+        </main>
+    </body>
+    </html>
+}

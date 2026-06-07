@@ -1,0 +1,27 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  # Для Windows используем pre_cmd + cmd отдельно
+  pre_cmd = ["templ generate"]
+  cmd = "go build -o ./tmp/main.exe ./cmd/server"
+  bin = "./tmp/main.exe"
+  full_bin = "./tmp/main.exe"
+
+  include_ext = ["go", "templ", "html"]
+  exclude_dir = ["assets", "tmp", "vendor", "testdata", "benchdata", ".git"]
+  exclude_regex = ["_test.go", ".*_templ.go"]   
+  exclude_unchanged = false
+  follow_symlinks = false
+  kill_delay = "100ms"
+  log = "build-errors.log"
+  stop_on_error = true
+
+[log]
+  time = false
+
+[misc]
+  clean_on_exit = true
+
+[screen]
+  clear_on_rebuild = true

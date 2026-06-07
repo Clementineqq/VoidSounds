@@ -1,0 +1,9 @@
+.env
+static/uploads/
+static/uploads/*
+!static/uploads/.gitkeep
+*.log
+logs/
+tmp/
+temp/
+*.tmp
