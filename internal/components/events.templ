@@ -1,0 +1,150 @@
+package components
+
+import (
+	"strconv"
+	"voidsounds/internal/domain"
+)
+
+
+// FilterBar - панель фильтров с динамическими данными
+templ FilterBar(cities []domain.City, genres []domain.Genre, currentCity, currentGenre, currentSearch string) {
+	<div class="mb-8 p-4 bg-zinc-900/50 rounded-2xl border border-zinc-800">
+		<form hx-get="/events" hx-target="#main-content" hx-swap="innerHTML" class="flex flex-wrap gap-4 items-end">
+			
+			<!-- Поиск -->
+			<div class="flex-1 min-w-[200px]">
+				<label class="block text-xs text-zinc-400 mb-1">Поиск</label>
+				<input type="search" name="search" value={currentSearch} placeholder="Название, описание..."
+					   class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm focus:border-violet-500 outline-none">
+			</div>
+			
+			<!-- Город (динамический) -->
+			<div class="min-w-[150px]">
+				<label class="block text-xs text-zinc-400 mb-1">Город</label>
+				<select name="city" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm focus:border-violet-500 outline-none">
+					<option value="">Все города</option>
+					for _, city := range cities {
+						<option value={city.Slug} { selectedIf(currentCity==city.Slug) }>{city.Name}</option>
+					}
+				</select>
+			</div>
+			
+			<!-- Жанр (динамический) -->
+			<div class="min-w-[150px]">
+				<label class="block text-xs text-zinc-400 mb-1">Жанр</label>
+				<select name="genre" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm focus:border-violet-500 outline-none">
+					<option value="">Все жанры</option>
+					for _, genre := range genres {
+						<option value={genre.Slug} { selectedIf(currentGenre==genre.Slug) }>{genre.Name}</option>
+					}
+				</select>
+			</div>
+			
+			<!-- Кнопка поиска -->
+			<button type="submit" class="px-4 py-2 bg-violet-600 hover:bg-violet-700 rounded-lg text-sm font-medium transition">
+				 Найти
+			</button>
+			
+			<!-- Сброс -->
+			<a href="/events" hx-get="/events" hx-target="#main-content" hx-swap="innerHTML"
+			   class="px-4 py-2 text-sm text-zinc-400 hover:text-violet-400 transition">
+				Сбросить
+			</a>
+		</form>
+	</div>
+}
+
+// EventsContent - список мероприятий
+templ EventsContent(events domain.Events, cities []domain.City, genres []domain.Genre, currentCity, currentGenre, currentSearch string) {
+	<div class="max-w-6xl mx-auto px-6 py-10" id="main-content">
+		@FilterBar(cities, genres, currentCity, currentGenre, currentSearch)
+		
+		<h1 class="text-4xl font-bold mb-8">Ближайшие мероприятия</h1>
+		
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+			for _, event := range events {
+				<div class="bg-zinc-900 rounded-3xl overflow-hidden border border-zinc-800 hover:border-violet-500 transition-all duration-300">
+					<!-- Постер -->
+					<div class="h-48 bg-zinc-800 flex items-center justify-center relative overflow-hidden">
+						if event.PosterURL != nil && *event.PosterURL != "" {
+							<img
+								src={ *event.PosterURL }
+								class="w-full h-full object-cover absolute inset-0"
+								alt={ event.Title }
+							/>
+						} else {
+							<span class="text-zinc-500 text-sm z-10">Нет постера</span>
+						}
+					</div>
+					
+					<div class="p-6">
+						<div class="flex justify-between items-start mb-4">
+							<h3 class="text-xl font-semibold leading-tight pr-2">{ event.Title }</h3>
+							if event.Status == "published" {
+								<span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-medium rounded-full">
+									Активно
+								</span>
+							}
+						</div>
+						
+						<p class="text-zinc-400 text-sm mb-5 line-clamp-3">
+							{ event.Description }
+						</p>
+						
+						<div class="space-y-2 text-sm text-zinc-400 mb-6">
+							<div class="flex items-center gap-2">
+								<span>📅</span>
+								<span>{ event.Date.Format("02.01.2006 • 15:04") }</span>
+							</div>
+							<div class="flex items-center gap-2">
+								<span>📍</span>
+								if event.Address != "" {
+									<span>{ event.Address }</span>
+								} else {
+									<span>Место не указано</span>
+								}
+							</div>
+						</div>
+						
+						<div class="flex justify-between items-end">
+							<div>
+								if event.Price == 0 {
+									<span class="inline-block px-3 py-1.5 bg-emerald-500/10 text-emerald-400 text-sm font-semibold rounded-xl border border-emerald-500/20">
+										Свободный вход
+									</span>
+								} else {
+									<div>
+										<span class="text-3xl font-bold">{ event.Price }</span>
+										<span class="text-zinc-500 text-lg"> ₽</span>
+									</div>
+								}
+							</div>
+							
+							<button
+								class="bg-violet-600 hover:bg-violet-700 px-7 py-3.5 rounded-2xl text-sm font-medium transition-all active:scale-95"
+								hx-get={ "/event/" + strconv.Itoa(event.ID) }
+								hx-target="#main-content"
+								hx-swap="innerHTML"
+							>
+								Подробнее
+							</button>
+						</div>
+					</div>
+				</div>
+			}
+			
+			if len(events) == 0 {
+				<div class="col-span-3 text-center py-20">
+					<p class="text-zinc-400 text-lg">Пока нет предстоящих мероприятий</p>
+				</div>
+			}
+		</div>
+	</div>
+}
+
+// Events - полная страница
+templ Events(events domain.Events, cities []domain.City, genres []domain.Genre, currentCity, currentGenre, currentSearch string) {
+	@Layout("Мероприятия") {
+		@EventsContent(events, cities, genres, currentCity, currentGenre, currentSearch)
+	}
+}

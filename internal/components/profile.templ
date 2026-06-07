@@ -1,0 +1,128 @@
+package components
+
+import (
+	"strconv"
+	"time"
+	"voidsounds/internal/domain"
+)
+
+// Хелперы для профиля
+func localTime(t time.Time) string {
+	return t.In(time.Local).Format("02.01.2006 • 15:04")
+}
+func statusRu(status string) string {
+	switch status {
+	case "paid": return "Оплачен"
+	case "refunded": return "Возврат"
+	case "cancelled": return "Отменён"
+	default: return status
+	}
+}
+func statusClassRu(status string) string {
+	switch status {
+	case "paid": return "bg-emerald-500/20 text-emerald-400"
+	case "refunded": return "bg-yellow-500/20 text-yellow-400"
+	case "cancelled": return "bg-red-500/20 text-red-400"
+	default: return "bg-zinc-800 text-zinc-400"
+	}
+}
+
+templ ProfilePage(tickets []domain.Ticket) {
+	@Layout("Личный кабинет") {
+		<div class="max-w-4xl mx-auto px-6 py-10" id="main-content">
+			<h1 class="text-3xl font-bold mb-8">Мои билеты</h1>
+			@ProfileContent(tickets)
+		</div>
+	}
+}
+
+templ ProfileContent(tickets []domain.Ticket) {
+	if len(tickets) == 0 {
+		<div class="text-center py-16 bg-zinc-900/50 rounded-2xl border border-zinc-800">
+			<p class="text-zinc-400 mb-4">У вас пока нет купленных билетов</p>
+			<a href="/events" hx-get="/events" hx-target="#main-content" hx-swap="innerHTML" class="text-violet-400 hover:underline">Посмотреть мероприятия →</a>
+		</div>
+	} else {
+		<div class="grid gap-4">
+			for _, ticket := range tickets {
+				<div class="bg-zinc-900 p-5 rounded-2xl border border-zinc-800 flex gap-4">
+					<div class="w-24 h-24 bg-zinc-800 rounded-xl overflow-hidden flex-shrink-0">
+						if ticket.EventPosterURL != nil && *ticket.EventPosterURL != "" {
+							<img src={ *ticket.EventPosterURL } alt={ ticket.EventTitle } class="w-full h-full object-cover"/>
+						} else {
+							<div class="w-full h-full flex items-center justify-center text-zinc-500 text-xs">Нет фото</div>
+						}
+					</div>
+					<div class="flex-1">
+						<h3 class="font-semibold text-lg">{ ticket.EventTitle }</h3>
+						<p class="text-sm text-zinc-400 mb-2">
+							{ localTime(ticket.EventDate) } | { ticket.EventAddress }
+						</p>
+						<div class="flex items-center gap-3 text-sm">
+							<span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">{ ticket.Quantity } шт.</span>
+							<span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">{ ticket.TotalPrice } ₽</span>
+							<span class={ "px-2 py-0.5 rounded " + statusClassRu(ticket.Status) }>{ statusRu(ticket.Status) }</span>
+							if ticket.EventStatus != "" {
+								<span class={ "px-2 py-0.5 rounded " + eventStatusClass(ticket.EventStatus) }>{ eventStatusRu(ticket.EventStatus) }</span>
+							}
+						</div>
+						<p class="text-xs text-zinc-500 mt-2">Куплен: { localTime(ticket.PurchaseDate) }</p>
+					</div>
+					<div class="flex flex-col items-end gap-2">
+						<button hx-get={ "/event/" + strconv.Itoa(ticket.EventID) } hx-target="#main-content" hx-swap="innerHTML" class="px-4 py-2 text-sm bg-violet-600 hover:bg-violet-700 rounded-xl transition">Подробнее</button>
+						
+						<!-- Кнопка QR для ЭТОГО билета -->
+						<button 
+							data-ticket-id={ strconv.Itoa(ticket.ID) }
+							onclick="showQRModal(this.dataset.ticketId)"
+							class="px-3 py-1 text-xs bg-emerald-600 hover:bg-emerald-700 rounded-lg transition">
+							📱 QR
+						</button>
+					</div>
+				</div>
+			}
+		</div>
+	}
+	
+			<!-- Единое модальное окно (в конце ProfileContent, после цикла) -->
+			<div id="qr-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50" onclick="this.classList.add('hidden')">
+				<div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-700 max-w-sm" onclick="event.stopPropagation()">
+					<h3 class="text-lg font-semibold mb-4">Ваш билет</h3>
+					<div id="qr-modal-content" class="flex justify-center">
+						<!-- QR загружается как обычное изображение -->
+						<img id="qr-image" src="" alt="QR код" class="w-48 h-48"/>
+					</div>
+					<button onclick="document.getElementById('qr-modal').classList.add('hidden')" 
+							class="mt-4 w-full py-2 bg-zinc-700 hover:bg-zinc-600 rounded-xl text-sm transition">
+						Закрыть
+					</button>
+				</div>
+			</div>
+
+			<!-- Скрипт для показа QR -->
+			<script>
+			function showQRModal(ticketID) {
+				const modal = document.getElementById('qr-modal');
+				const qrImg = document.getElementById('qr-image');
+				qrImg.src = '/ticket/' + ticketID + '/qr?' + Date.now(); // cache busting
+				modal.classList.remove('hidden');
+			}
+			</script>
+}
+
+func eventStatusRu(status string) string {
+	switch status {
+	case "published": return "Активно"
+	case "draft": return "Черновик"
+	case "cancelled": return "Отменено"
+	default: return status
+	}
+}
+func eventStatusClass(status string) string {
+	switch status {
+	case "published": return "bg-blue-500/20 text-blue-400"
+	case "draft": return "bg-yellow-500/20 text-yellow-400"
+	case "cancelled": return "bg-red-500/20 text-red-400"
+	default: return "bg-zinc-800 text-zinc-400"
+	}
+}
