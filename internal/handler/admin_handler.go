@@ -47,7 +47,7 @@ func (h *AdminHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// GET /admin/users - список пользователей
+// GET /admin/users
 func (h *AdminHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
 	users, err := h.userService.GetAllUsers()
 	if err != nil {
@@ -63,7 +63,7 @@ func (h *AdminHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// GET /admin/users/{id} - информация о пользователе
+// GET /admin/users/{id}
 func (h *AdminHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
@@ -78,7 +78,7 @@ func (h *AdminHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Получаем статистику пользователя
+	// статистику пользователя
 	userEvents, _ := h.eventService.GetEventsByOrganizer(id)
 	userTickets, _ := h.eventService.GetUserTickets(id)
 
@@ -86,7 +86,7 @@ func (h *AdminHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	component.Render(r.Context(), w)
 }
 
-// POST /admin/users/{id}/role - смена роли пользователя
+// POST /admin/users/{id}/role смена роли
 func (h *AdminHandler) ChangeUserRole(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
@@ -117,7 +117,7 @@ func (h *AdminHandler) ChangeUserRole(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-// POST /admin/users/{id}/ban - бан/разбан пользователя
+// POST /admin/users/{id}/ban
 func (h *AdminHandler) BanUser(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
@@ -136,7 +136,7 @@ func (h *AdminHandler) BanUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-// GET /admin/events - список всех мероприятий
+// GET /admin/events
 func (h *AdminHandler) GetEvents(w http.ResponseWriter, r *http.Request) {
 	events, err := h.eventService.GetAllEventsForAdmin()
 	if err != nil {
@@ -151,7 +151,7 @@ func (h *AdminHandler) GetEvents(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// POST /admin/events/{id}/status - смена статуса мероприятия
+// POST /admin/events/{id}/status смена статуса
 func (h *AdminHandler) ChangeEventStatus(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
@@ -172,7 +172,7 @@ func (h *AdminHandler) ChangeEventStatus(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	// Получаем ID организатора для проверки
+	//  id орга для проверки
 	event, err := h.eventService.GetEventByID(id)
 	if err != nil {
 		components.ErrorMessage("Мероприятие не найдено").Render(r.Context(), w)
@@ -189,7 +189,7 @@ func (h *AdminHandler) ChangeEventStatus(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(http.StatusOK)
 }
 
-// DELETE /admin/events/{id} - удаление мероприятия
+// DELETE /admin/events/{id}
 func (h *AdminHandler) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
@@ -207,7 +207,6 @@ func (h *AdminHandler) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-// Вспомогательные методы
 func (h *AdminHandler) calculateTotalTickets(events domain.Events) int {
 	total := 0
 	for _, e := range events {
@@ -216,7 +215,7 @@ func (h *AdminHandler) calculateTotalTickets(events domain.Events) int {
 	return total
 }
 
-// GET /admin/events/{id}/edit - форма редактирования
+// GET /admin/events/{id}/edit форма редактирования
 func (h *AdminHandler) EditEventForm(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
@@ -238,7 +237,7 @@ func (h *AdminHandler) EditEventForm(w http.ResponseWriter, r *http.Request) {
 	component.Render(r.Context(), w)
 }
 
-// POST /admin/events/{id}/update - обновление мероприятия
+// POST /admin/events/{id}/update
 func (h *AdminHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
@@ -247,7 +246,7 @@ func (h *AdminHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Получаем существующее мероприятие
+	// существующее мероприятие
 	existingEvent, err := h.eventService.GetEventByIDForEdit(id)
 	if err != nil {
 		components.ErrorMessage("Мероприятие не найдено").Render(r.Context(), w)
@@ -266,10 +265,9 @@ func (h *AdminHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	price, _ := strconv.Atoi(r.FormValue("price"))
 	available, _ := strconv.Atoi(r.FormValue("available"))
 
-	// Начинаем с существующего постера
 	posterURL := existingEvent.PosterURL
 
-	// Проверяем, загружен ли новый файл
+	//загружен ли новый файл
 	file, header, err := r.FormFile("poster")
 	if err == nil && file != nil {
 		defer file.Close()
@@ -297,7 +295,7 @@ func (h *AdminHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 		Address:     r.FormValue("address"),
 		Price:       price,
 		Available:   available,
-		PosterURL:   posterURL, // Используем существующий или новый постер
+		PosterURL:   posterURL, //существующий или новый постер
 		Status:      r.FormValue("status"),
 	}
 

@@ -175,17 +175,14 @@ func (s *EventService) GetEventsByOrganizer(organizerID int) (domain.Events, err
 	return s.repo.GetByOrganizerID(organizerID)
 }
 
-// GetAllEventsForAdmin - получить все мероприятия (для админа, без фильтра по статусу)
 func (s *EventService) GetAllEventsForAdmin() (domain.Events, error) {
 	return s.repo.GetAllEventsForAdmin()
 }
 
-// DeleteEventAdmin - удаление мероприятия админом (без проверки владельца)
 func (s *EventService) DeleteEventAdmin(eventID int) error {
 	return s.repo.Delete(eventID)
 }
 
-// UpdateEventAdmin - обновление мероприятия админом (без проверки владельца)
 func (s *EventService) UpdateEventAdmin(eventID int, req *domain.Event) error {
 	existing, err := s.repo.GetByID(eventID)
 	if err != nil {

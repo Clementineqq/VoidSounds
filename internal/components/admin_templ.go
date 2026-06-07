@@ -19,7 +19,7 @@ type AdminStats struct {
 	TotalTickets int
 }
 
-// AdminDashboard - главная страница админки (с Layout)
+// лавная страница админки с Layout
 func AdminDashboard(stats AdminStats, users []domain.User, events domain.Events) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -67,7 +67,7 @@ func AdminDashboard(stats AdminStats, users []domain.User, events domain.Events)
 	})
 }
 
-// AdminDashboardContent - только контент для HTMX
+// только контент для HTMX
 func AdminDashboardContent(stats AdminStats, users []domain.User, events domain.Events) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -128,7 +128,7 @@ func AdminDashboardContent(stats AdminStats, users []domain.User, events domain.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div></div></div><!-- Быстрые ссылки --><div class=\"grid grid-cols-1 md:grid-cols-2 gap-6\"><a href=\"/admin/users\" hx-get=\"/admin/users\" hx-target=\"#main-content\" hx-swap=\"innerHTML\" class=\"bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-violet-500 transition\"><h2 class=\"text-xl font-semibold mb-2\">👥 Пользователи</h2><p class=\"text-zinc-400\">Управление пользователями и ролями</p></a> <a href=\"/admin/events\" hx-get=\"/admin/events\" hx-target=\"#main-content\" hx-swap=\"innerHTML\" class=\"bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-violet-500 transition\"><h2 class=\"text-xl font-semibold mb-2\">🎪 Мероприятия</h2><p class=\"text-zinc-400\">Модерация и управление событиями</p></a></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div></div></div><div class=\"grid grid-cols-1 md:grid-cols-2 gap-6\"><a href=\"/admin/users\" hx-get=\"/admin/users\" hx-target=\"#main-content\" hx-swap=\"innerHTML\" class=\"bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-violet-500 transition\"><h2 class=\"text-xl font-semibold mb-2\">👥 Пользователи</h2><p class=\"text-zinc-400\">Управление пользователями и ролями</p></a> <a href=\"/admin/events\" hx-get=\"/admin/events\" hx-target=\"#main-content\" hx-swap=\"innerHTML\" class=\"bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-violet-500 transition\"><h2 class=\"text-xl font-semibold mb-2\">🎪 Мероприятия</h2><p class=\"text-zinc-400\">Модерация и управление событиями</p></a></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -136,7 +136,7 @@ func AdminDashboardContent(stats AdminStats, users []domain.User, events domain.
 	})
 }
 
-// AdminUsersPage - полная страница пользователей с Layout
+// полная страница пользователей с Layout
 func AdminUsersPage(users []domain.User) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -184,7 +184,7 @@ func AdminUsersPage(users []domain.User) templ.Component {
 	})
 }
 
-// AdminEventsPage - полная страница мероприятий с Layout
+// полная страница мероприятий с Layout
 func AdminEventsPage(events domain.Events) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -232,7 +232,7 @@ func AdminEventsPage(events domain.Events) templ.Component {
 	})
 }
 
-// AdminUsersList - список пользователей
+// список пользователей
 func AdminUsersList(users []domain.User) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -385,7 +385,7 @@ func AdminUsersList(users []domain.User) templ.Component {
 	})
 }
 
-// AdminUserDetail - детальная информация о пользователе
+// детальная информация о юзере
 func AdminUserDetail(user *domain.User, events domain.Events, tickets []domain.Ticket) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -510,7 +510,7 @@ func AdminUserDetail(user *domain.User, events domain.Events, tickets []domain.T
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</span></div></div><!-- Смена роли --><div class=\"mt-6 pt-6 border-t border-zinc-800\"><h3 class=\"text-lg font-semibold mb-3\">Сменить роль</h3><form hx-post=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</span></div></div><div class=\"mt-6 pt-6 border-t border-zinc-800\"><h3 class=\"text-lg font-semibold mb-3\">Сменить роль</h3><form hx-post=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -576,7 +576,7 @@ func AdminUserDetail(user *domain.User, events domain.Events, tickets []domain.T
 	})
 }
 
-// AdminEventsList - список мероприятий
+// список мероприятий
 func AdminEventsList(events domain.Events) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -775,7 +775,7 @@ func AdminEventsList(events domain.Events) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, ">Отменено</option></select></form><!-- Удаление --><button hx-delete=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, ">Отменено</option></select></form><button hx-delete=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -801,7 +801,7 @@ func AdminEventsList(events domain.Events) templ.Component {
 	})
 }
 
-// AdminEditEventForm - форма редактирования мероприятия
+// редактирования мероприятия
 func AdminEditEventForm(event *domain.Event, genres []domain.Genre) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -984,7 +984,6 @@ func AdminEditEventForm(event *domain.Event, genres []domain.Genre) templ.Compon
 	})
 }
 
-// Вспомогательные функции
 func roleClass(role string) string {
 	switch role {
 	case "admin":

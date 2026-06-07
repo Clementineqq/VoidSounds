@@ -50,14 +50,14 @@ func GetUserID(r *http.Request) int {
 func RequireAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if GetUserID(r) == 0 {
-			// Проверяем, это HTMX-запрос или обычный переход в браузере
+			// HTMX-запрос или обычный переход в браузере
 			if r.Header.Get("HX-Request") == "true" {
-				// Для HTMX: отправляем спец-заголовок для редиректа
+				// для HTMX: отправляем спец-заголовок для редиректа
 				w.Header().Set("HX-Redirect", "/login")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
-			// Для обычного браузера: стандартный HTTP-редирект
+			// для браузера стандартный HTTP-редирект
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}

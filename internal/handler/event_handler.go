@@ -264,17 +264,17 @@ func (h *EventHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 
 	available, _ := strconv.Atoi(r.FormValue("available"))
 
-	// Получаем существующее мероприятие для сохранения старого постера
+	// существующее мероприятие для сохранения старого постера
 	existingEvent, err := h.service.GetEventByIDForEdit(id)
 	if err != nil {
 		components.ErrorMessage("Мероприятие не найдено").Render(r.Context(), w)
 		return
 	}
 
-	// Начинаем с существующего постера
+	// начинаем с существующего постера
 	posterURL := existingEvent.PosterURL
 
-	// Проверяем, загружен ли новый файл
+	// загружен ли новый файл
 	file, header, err := r.FormFile("poster")
 	if err == nil && file != nil {
 		defer file.Close()
@@ -302,10 +302,10 @@ func (h *EventHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Получаем статус из формы, если он есть
+	// статус из формы, если он есть
 	status := r.FormValue("status")
 	if status == "" {
-		status = "published" // Значение по умолчанию
+		status = "published"
 	}
 
 	event := &domain.Event{
@@ -425,26 +425,26 @@ func (h *EventHandler) ShowOrganizerProfile(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	// Получаем информацию об организаторе
+	// информацию об организаторе
 	organizer, err := h.userService.GetUserByID(id)
 	if err != nil {
 		components.ErrorMessage("Организатор не найден").Render(r.Context(), w)
 		return
 	}
 
-	// Получаем все мероприятия организатора
+	// все мероприятия организатора
 	events, err := h.service.GetEventsByOrganizer(id)
 	if err != nil {
 		components.ErrorMessage("Ошибка загрузки мероприятий").Render(r.Context(), w)
 		return
 	}
 
-	// Проверяем тип запроса (HTMX или обычный)
+	// тип запроса (HTMX или обычный)
 	if r.Header.Get("HX-Request") == "true" {
 		// Для HTMX рендерим только контент без Layout
 		components.OrganizerProfileContent(organizer, events).Render(r.Context(), w)
 	} else {
-		// Для обычного запроса рендерим полный Layout
+		// для обычного запроса рендерим полный Layout
 		components.OrganizerProfilePage(organizer, events).Render(r.Context(), w)
 	}
 }

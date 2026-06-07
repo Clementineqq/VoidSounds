@@ -8,7 +8,7 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-// Форма регистрации (полная страница с Layout)
+// регистрация полная страница с Layout
 func RegisterForm() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -56,7 +56,7 @@ func RegisterForm() templ.Component {
 	})
 }
 
-// Форма входа (полная страница с Layout)
+// вход полная страница с Layout
 func LoginForm() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -104,7 +104,7 @@ func LoginForm() templ.Component {
 	})
 }
 
-// Сообщение об успешной регистрации/входе (только контент, без Layout, т.к. HTMX подгружает)
+// успешная регистрация/входя (без Layout)
 func AuthSuccess(message string, redirectURL string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -160,7 +160,7 @@ func AuthSuccess(message string, redirectURL string) templ.Component {
 	})
 }
 
-// Ошибка (только контент, без Layout)
+// без Layout
 func ErrorMessage(message string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context

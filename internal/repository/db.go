@@ -32,5 +32,5 @@ func InitDB(cfg *config.Config) {
 		return
 	}
 
-	log.Println("✅ Успешно подключились к PostgreSQL")
+	log.Println(" ура успешно подключились к PostgreSQL")
 }

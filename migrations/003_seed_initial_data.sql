@@ -1,5 +1,4 @@
--- 003_seed_initial_data.sql
--- Начальные данные: жанры и города
+
 
 INSERT INTO genres (name, slug) VALUES
 ('Инди-рок', 'indi-rock'),
@@ -32,6 +31,5 @@ INSERT INTO cities (name, slug) VALUES
 ('Самара', 'samara')
 ON CONFLICT (slug) DO NOTHING;
 
--- Проверка
 SELECT 'Жанров добавлено:' || COUNT(*) FROM genres;
 SELECT 'Городов добавлено:' || COUNT(*) FROM cities;

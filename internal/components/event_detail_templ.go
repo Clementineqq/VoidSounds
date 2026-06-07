@@ -35,7 +35,7 @@ func eventDetailContent(event *domain.Event) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-4xl mx-auto px-6 py-10\" id=\"main-content\"><!-- Хлебные крошки --><div class=\"text-sm text-zinc-400 mb-6\"><a href=\"/\" class=\"hover:text-violet-400\">Главная</a> <span class=\"mx-2\">/</span> <a href=\"/events\" class=\"hover:text-violet-400\">Мероприятия</a> <span class=\"mx-2\">/</span> <span class=\"text-zinc-300\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-4xl mx-auto px-6 py-10\" id=\"main-content\"><div class=\"text-sm text-zinc-400 mb-6\"><a href=\"/\" class=\"hover:text-violet-400\">Главная</a> <span class=\"mx-2\">/</span> <a href=\"/events\" class=\"hover:text-violet-400\">Мероприятия</a> <span class=\"mx-2\">/</span> <span class=\"text-zinc-300\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -48,7 +48,7 @@ func eventDetailContent(event *domain.Event) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</span></div><!-- Основная карточка --><div class=\"bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-3xl overflow-hidden border border-zinc-800\"><!-- Постер --><div class=\"h-96 bg-zinc-800 relative\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</span></div><!-- основная карточка --><div class=\"bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-3xl overflow-hidden border border-zinc-800\"><!-- постер --><div class=\"h-96 bg-zinc-800 relative\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -102,7 +102,7 @@ func eventDetailContent(event *domain.Event) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</h1><!-- Статус -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</h1><!-- статус -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -122,7 +122,7 @@ func eventDetailContent(event *domain.Event) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<!-- Описание --><p class=\"text-zinc-300 text-lg leading-relaxed mb-8\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<!-- описание --><p class=\"text-zinc-300 text-lg leading-relaxed mb-8\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -168,7 +168,7 @@ func eventDetailContent(event *domain.Event) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<!-- Детали в сетке --><div class=\"grid md:grid-cols-2 gap-6 mb-8\"><div class=\"space-y-3\"><div class=\"flex items-center gap-3 text-zinc-300\"><span class=\"text-2xl\">📅</span><div><div class=\"text-sm text-zinc-400\">Дата и время</div><div class=\"font-semibold\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<!-- детали в сетке --><div class=\"grid md:grid-cols-2 gap-6 mb-8\"><div class=\"space-y-3\"><div class=\"flex items-center gap-3 text-zinc-300\"><span class=\"text-2xl\">📅</span><div><div class=\"text-sm text-zinc-400\">Дата и время</div><div class=\"font-semibold\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -207,7 +207,7 @@ func eventDetailContent(event *domain.Event) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div></div></div><!-- Карта --><div class=\"mb-6\"><label class=\"block text-sm text-zinc-400 mb-2\">📍 Местоположение</label><div style=\"position:relative;overflow:hidden;border-radius:12px;\"><iframe src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div></div></div><!-- Карта --><div class=\"mb-6\"><label class=\"block text-sm text-zinc-400 mb-2\">Местоположение</label><div style=\"position:relative;overflow:hidden;border-radius:12px;\"><iframe src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -389,7 +389,7 @@ func eventDetailContent(event *domain.Event) templ.Component {
 	})
 }
 
-// Для прямого перехода (с шапкой)
+// для прямого перехода с шапкой
 func EventDetailPage(event *domain.Event) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -437,7 +437,7 @@ func EventDetailPage(event *domain.Event) templ.Component {
 	})
 }
 
-// Для HTMX запросов (без шапки)
+// для HTMX запросов  без шапки
 func EventDetailContent(event *domain.Event) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
