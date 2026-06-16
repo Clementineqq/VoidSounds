@@ -2,7 +2,6 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
-  # Для Windows используем pre_cmd + cmd отдельно
   pre_cmd = ["templ generate"]
   cmd = "go build -o ./tmp/main.exe ./cmd/server"
   bin = "./tmp/main.exe"
