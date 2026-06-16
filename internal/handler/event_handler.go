@@ -254,7 +254,6 @@ func (h *EventHandler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Обработка типа мероприятия (платное/бесплатное)
 	eventType := r.FormValue("event_type")
 	price := 0
 	if eventType != "free" {
@@ -375,7 +374,6 @@ func (h *EventHandler) ChangeStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Парсим форму
 	if err := r.ParseForm(); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -399,7 +397,7 @@ func (h *EventHandler) ChangeStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Перенаправляем на список мероприятий организатора
+	// на список мероприятий организатора
 	w.Header().Set("HX-Redirect", "/organizer/events")
 	w.WriteHeader(http.StatusOK)
 }
@@ -416,7 +414,7 @@ func (h *EventHandler) TicketQR(w http.ResponseWriter, r *http.Request) {
 	w.Write(png)
 }
 
-// GET /organizer/{id} - страница организатора
+// GET /organizer/{id} - орг
 func (h *EventHandler) ShowOrganizerProfile(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
@@ -439,7 +437,7 @@ func (h *EventHandler) ShowOrganizerProfile(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	// тип запроса (HTMX или обычный)
+	// тип запроса HTMX или обычный
 	if r.Header.Get("HX-Request") == "true" {
 		// Для HTMX рендерим только контент без Layout
 		components.OrganizerProfileContent(organizer, events).Render(r.Context(), w)

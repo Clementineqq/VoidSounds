@@ -200,7 +200,6 @@ func (r *eventRepository) GetAllWithFilters(citySlug, genreSlug, search string) 
 		paramIndex++
 	}
 
-	// Поиск
 	if search != "" {
 		query += fmt.Sprintf(` AND (e.title ILIKE $%d OR e.description ILIKE $%d)`, paramIndex, paramIndex+1)
 		args = append(args, "%"+search+"%", "%"+search+"%")
@@ -260,12 +259,12 @@ func (r *eventRepository) AssignGenresToEvent(eventID int, genreIDs []int) error
 	if DB == nil {
 		return fmt.Errorf("база данных не подключена")
 	}
-	// Сначала удаляем старые связи
+	// сначала удаляем старые связи
 	_, err := DB.Exec(`DELETE FROM event_genres WHERE event_id = $1`, eventID)
 	if err != nil {
 		return fmt.Errorf("ошибка удаления старых жанров: %w", err)
 	}
-	// Добавляем новые
+	// добавляем новые
 	for _, genreID := range genreIDs {
 		_, err := DB.Exec(`INSERT INTO event_genres (event_id, genre_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`, eventID, genreID)
 		if err != nil {

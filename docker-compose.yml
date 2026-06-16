@@ -53,7 +53,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - voidsounds_net   # <--- добавить эту строку
+      - voidsounds_net  
     profiles:
       - migrate
 volumes:

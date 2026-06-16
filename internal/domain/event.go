@@ -23,7 +23,6 @@ type Event struct {
 
 type Events []Event
 
-// Ticket - купленный билет (расширенный для отображения)
 type Ticket struct {
 	ID           int       `db:"id" json:"id"`
 	EventID      int       `db:"event_id" json:"event_id"`
@@ -33,7 +32,6 @@ type Ticket struct {
 	PurchaseDate time.Time `db:"purchase_date" json:"purchase_date"`
 	Status       string    `db:"status" json:"status"`
 
-	// Данные мероприятия (для отображения)
 	EventTitle     string    `db:"title" json:"event_title"`
 	EventDate      time.Time `db:"date" json:"event_date"`
 	EventAddress   string    `db:"address" json:"event_address"`
