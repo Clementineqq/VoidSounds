@@ -42,16 +42,15 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		Role:     r.FormValue("role"),
 	}
 
-	// Регистрируем пользователя
 	user, err := h.userService.Register(req)
 	if err != nil {
-		// Показываем ошибку
+
 		component := components.ErrorMessage(err.Error())
 		component.Render(r.Context(), w)
 		return
 	}
 
-	// Создаем сессию
+	//  Сессии наши сессии)0))
 	session, _ := middleware.Store.Get(r, "user-session")
 	session.Values["user_id"] = user.ID
 	session.Values["user_email"] = user.Email
@@ -59,12 +58,11 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	session.Values["user_role"] = user.Role
 	session.Save(r, w)
 
-	// Показываем успех
 	component := components.AuthSuccess("Регистрация прошла успешно!", "/events")
 	component.Render(r.Context(), w)
 }
 
-// GET /login - показать форму входа
+// GET /login
 func (h *AuthHandler) ShowLogin(w http.ResponseWriter, r *http.Request) {
 	component := components.LoginForm()
 	if err := component.Render(r.Context(), w); err != nil {
@@ -72,9 +70,9 @@ func (h *AuthHandler) ShowLogin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// POST /login - обработка входа
+// POST /login
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
-	// Парсим форму
+
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "Ошибка обработки формы", http.StatusBadRequest)
 		return
@@ -83,7 +81,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 
-	// Проверяем учетные данные
+	// учетные данные
 	user, err := h.userService.Login(email, password)
 	if err != nil {
 		component := components.ErrorMessage("Неверный email или пароль")
@@ -91,7 +89,6 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Создаем сессию
 	session, _ := middleware.Store.Get(r, "user-session")
 	session.Values["user_id"] = user.ID
 	session.Values["user_email"] = user.Email
@@ -99,12 +96,11 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	session.Values["user_role"] = user.Role
 	session.Save(r, w)
 
-	// Показываем успех
 	component := components.AuthSuccess("Добро пожаловать!", "/events")
 	component.Render(r.Context(), w)
 }
 
-// GET /logout - выход из системы
+// GET /logout
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	// Удаляем сессию
 	session, _ := middleware.Store.Get(r, "user-session")
