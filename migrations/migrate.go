@@ -20,6 +20,7 @@ func main() {
 		"migrations/002_create_full_schema.sql",
 		"migrations/003_seed_initial_data.sql",
 		"migrations/004_seed_test_events.sql",
+		"migrations/005_seed_indexes.sql",
 	}
 
 	for _, file := range migrationFiles {

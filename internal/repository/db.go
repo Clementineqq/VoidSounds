@@ -25,7 +25,6 @@ func InitDB(cfg *config.Config) {
 		return
 	}
 
-	// Проверка соединения
 	if err = DB.Ping(); err != nil {
 		log.Printf("Ошибка Ping к PostgreSQL: %v", err)
 		DB = nil
