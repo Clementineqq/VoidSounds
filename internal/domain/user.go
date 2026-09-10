@@ -12,7 +12,6 @@ type User struct {
 	UpdatedAt    time.Time `db:"updated_at" json:"updated_at"`
 }
 
-// Для регистрации и входа
 type RegisterRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
