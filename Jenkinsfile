@@ -1,21 +1,60 @@
-@Library('jenkins-shared-lib') _
+@Library('jenkins-shared-lib@dev') _
 
-def pipelineConfig = [
-    appName: 'Clementineqq/voidsounds',
-    registry: 'ghcr.io'
-]
+pipeline {
+    agent any //встроенный узел дженинкс, там должны быть docker CLI и доступ к демону
 
-def ciPipeline = load('jenkins-pipelines/ci/voidsounds.groovy')
-def cdStaging = load('jenkins-pipelines/cd/staging.groovy')
-
-node {
-    checkout scm
-
-    stage('CI') {
-        ciPipeline.call(pipelineConfig)
+    environment {
+        APP_NAME  = 'voidsounds'
+        REGISTRY  = 'ghcr.io'
+        IMAGE_TAG = "${env.BUILD_NUMBER}" //номер сборки дженкинс
     }
 
-    stage('CD Staging') {
-        cdStaging.call(pipelineConfig + [imageTag: env.BUILD_NUMBER])
+    options {
+        disableConcurrentBuilds() //не запускать две сборки одной джобы одновременно
+
+        
+        buildDiscarder(logRotator(numToKeepStr: '10')) // хранить логи только 10 последних сборок
+    }
+
+    stages {
+        stage('Test') { //проверка кода: go mod download + go vet + go test (внутри контейнера го)
+            steps {
+                runTests(action: 'all')
+            }
+        }
+
+        stage('Build Image') { // сборка докер-образа из dockerfile приложения
+
+            steps {
+                buildImage(
+                    imageName: "${APP_NAME}",
+                    imageTag:  "${IMAGE_TAG}"
+                )
+            }
+        }
+
+    
+        stage('Push to Registry') {
+            steps {
+                pushImage(
+                    registry:      "${REGISTRY}",
+                    imageName:     "${APP_NAME}",
+                    imageTag:      "${IMAGE_TAG}",
+                    credentialsId: 'github-registry'
+                )
+            }
+        }
+    }
+
+    post {
+        success {
+            notify(status: 'success', message: "Built ${REGISTRY}/${APP_NAME}:${IMAGE_TAG}")
+        }
+        failure {
+            notify(status: 'failure', message: "CI failed for ${APP_NAME}")
+        }
+        always {
+            echo "Сборка #${env.BUILD_NUMBER} завершена: ${currentBuild.currentResult}"
+        }
     }
 }
