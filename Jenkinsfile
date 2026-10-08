@@ -6,7 +6,7 @@ pipeline {
     environment {
         APP_NAME  = 'clementineqq/voidsounds'
         REGISTRY  = 'ghcr.io'
-        IMAGE_TAG = "${env.BUILD_NUMBER}" //номер сборки дженкинс
+        IMAGE_TAG = "${env.GIT_COMMIT.take(7)}" //короткий SHA коммита (первые 7 символов SHA-коммита)
     }
 
     options {
