@@ -49,7 +49,11 @@ pipeline {
     post {
         success {
             notify(status: 'success', message: "Built ${REGISTRY}/${APP_NAME}:${IMAGE_TAG}")
+            build job: 'voidsounds-cd-staging', // запускаю CD-джобу после успешного пуша CI
+                  parameters: [string(name: 'IMAGE_TAG', value: "${IMAGE_TAG}")], // прокидываю SHA, он попадает в params.IMAGE_TAG, оттуда в композ и в докер пулл
+                  wait: false //жду деплой
         }
+
         failure {
             notify(status: 'failure', message: "CI failed for ${APP_NAME}")
         }
