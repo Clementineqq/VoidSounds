@@ -54,6 +54,7 @@ pipeline {
                   wait: false
 
             script {
+                echo "BRANCH_NAME = [${env.BRANCH_NAME}]"
                 if (env.BRANCH_NAME == 'main') {
                     build job: 'voidsounds-cd-production',
                           parameters: [string(name: 'IMAGE_TAG', value: "${IMAGE_TAG}")],
