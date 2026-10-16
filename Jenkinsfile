@@ -1,7 +1,7 @@
 @Library('jenkins-shared-lib@dev') _
 
 pipeline {
-    agent any //встроенный узел дженинкс, там должны быть docker CLI и доступ к демону
+    agent { label 'docker' } //сборка на выделенном агенте, не на контроллере как в прошлый раз
 
     environment {
         APP_NAME  = 'clementineqq/voidsounds'
