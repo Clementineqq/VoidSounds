@@ -53,13 +53,15 @@ pipeline {
                   parameters: [string(name: 'IMAGE_TAG', value: "${IMAGE_TAG}")],
                   wait: false
 
-            // прод только если влили в мейн
-            if (env.BRANCH_NAME == 'main') {
-                build job: 'voidsounds-cd-production',
-                      parameters: [string(name: 'IMAGE_TAG', value: "${IMAGE_TAG}")],
-                      wait: false
+            script {
+                if (env.BRANCH_NAME == 'main') {
+                    build job: 'voidsounds-cd-production',
+                          parameters: [string(name: 'IMAGE_TAG', value: "${IMAGE_TAG}")],
+                          wait: false
+                }
             }
         }
+
 
 
         failure {
