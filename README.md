@@ -27,7 +27,3 @@ docker-compose down -v
 # env 
 DB_HOST=postgres для докера
 DB_HOST=localhost для натива
-
-
-# TODO
-подумать над картами и админ панелью

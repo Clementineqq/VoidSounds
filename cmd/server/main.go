@@ -51,6 +51,8 @@ func main() {
 	r.Post("/logout", authHandler.Logout)
 	r.Get("/auth/status", authHandler.GetAuthStatus)
 
+	r.Get("/healthz", handler.Healthz)
+
 	r.Group(func(r chi.Router) {
 		r.Use(mymw.RequireAuth)
 		r.Post("/event/{id}/buy", eventHandler.BuyTicket)

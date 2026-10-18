@@ -27,9 +27,9 @@ func Load() *Config {
 		DBHost:        getEnv("DB_HOST", "localhost"),
 		DBPort:        getEnv("DB_PORT", "5432"),
 		DBUser:        getEnv("DB_USER", "postgres"),
-		DBPassword:    getEnv("DB_PASSWORD", "1488"),
+		DBPassword:    mustGetEnv("DB_PASSWORD"),
 		DBName:        getEnv("DB_NAME", "voidsounds"),
-		SessionSecret: getEnv("SESSION_SECRET", "dev-secret-beshbarmak1499"),
+		SessionSecret: mustGetEnv("SESSION_SECRET"),
 	}
 }
 
@@ -38,4 +38,11 @@ func getEnv(key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
+}
+func mustGetEnv(key string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	log.Fatalf("Переменная окружения %s обязательна и не задана (секреты не имеют дефолтов).", key)
+	return "" //компилятор требует возврат функции
 }
