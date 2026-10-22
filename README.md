@@ -20,40 +20,47 @@ staging и production с ручным подтверждением.
 | Backend | Go 1.25, chi, templ, gorilla/sessions |
 | БД | PostgreSQL 15, sqlx, lib/pq |
 | Контейнеризация | Docker (multi-stage), Docker Compose |
-| CI/CD | Jenkins (shared library), GHCR, деплой по SSH |
+| CI/CD | Jenkins (multibranch + shared library), GHCR, деплой по SSH |
 
 ## Архитектура
 
 ```mermaid
 flowchart LR
     dev[Разработчик] -->|git push| gh[GitHub]
-    gh -->|webhook / polling| ci["Jenkins CI<br/>agent: docker"]
-    ci -->|go vet, go test| ci
+    gh -->|webhook / branch indexing| ci["Jenkins CI<br/>voidsounds-ci-multibranch"]
     ci -->|docker build| img["образ<br/>voidsounds:SHA"]
-    img -->|docker push| ghcr[(GHCR)]
-    ci -->|trigger| stg["CD: staging"]
-    stg -->|pull + compose up| vm1["VM: staging :8080"]
-    ci -->|только main,<br/>ручное подтверждение| prd["CD: production"]
-    prd -->|pull + compose up| vm2["VM: production :8080"]
-    stg -.->|healthcheck /healthz| ci
-    prd -.->|healthcheck /healthz| ci
+    img -->|docker tag + push| ghcr[(GHCR)]
+    ci -->|success, любая ветка| stg["CD: staging"]
+    ci -->|success, только main<br/>ручное подтверждение| prd["CD: production"]
+    stg -->|pull + compose up| vm1["VM <br/>"]
+    prd -->|pull + compose up| vm2["VM <br/>"]
+    stg --> hc1{"healthcheck<br/>/healthz"}
+    prd --> hc2{"healthcheck<br/>/healthz"}
 ```
+
+CI описана в [`Jenkinsfile`](Jenkinsfile), CD-джобы — в отдельном репозитории
+[`-jenkins-pipelines`](https://github.com/Clementineqq/-jenkins-pipelines).
+Оба стенда пока разворачиваются на одной VM, в одном каталоге `~/voidsounds`
+и на одном порту `8080`, поэтому одновременно работает только один из них.
 
 ## CI/CD
 
-Пайплайн описан в [`Jenkinsfile`](Jenkinsfile) и использует общую библиотеку
+CI — multibranch-джоба `voidsounds-ci-multibranch`: отдельная сборка на каждую
+ветку. Шаги вынесены в общую библиотеку
 [`jenkins-shared-lib`](https://github.com/Clementineqq/jenkins-shared-lib):
 
 | Стадия | Что происходит | Шаг библиотеки |
 |---|---|---|
-| Test | `go mod download`, `go vet`, `go test` в контейнере `golang:1.25-alpine` | `runTests(action: 'all')` |
-| Build Image | сборка образа, тег — первые 7 символов SHA коммита | `buildImage` |
-| Push to Registry | `docker login` → `push` → `docker logout` в GHCR | `pushImage` |
+| Test | `go mod download`, `go vet ./...`, `go test ./...` в контейнере `golang:1.25-alpine` | `runTests(action: 'all')` |
+| Build Image | `docker build`, тег — первые 7 символов SHA коммита | `buildImage` |
+| Push to Registry | `docker login` → `docker tag` → `docker push` → `docker logout` в GHCR | `pushImage` |
 
-Дальше в `post { success }`: уведомление и запуск CD-джобы. Staging запускается
-для любой ветки, production — **только из `main`** и с ручным подтверждением.
+В `post { success }` CI запускает CD-джобы: staging — для любой ветки,
+production — **только для `main`** и с ручным подтверждением. CI не ждёт их
+завершения (`wait: false`), поэтому зелёная сборка означает «образ
+опубликован», а не «задеплоено».
 
-Тег образа всегда SHA коммита (immutable), поэтому откат — это деплой
+Тег образа — всегда SHA коммита (immutable), поэтому откат — это деплой
 предыдущего тега, а не пересборка.
 
 ## Скриншоты
@@ -66,26 +73,32 @@ flowchart LR
 |---|---|
 | ![Approval](docs/img/cd-approval.png) | ![compose ps](docs/img/compose-ps.png) |
 
-
 ## Быстрый старт
 
 ```bash
 git clone https://github.com/Clementineqq/VoidSounds.git
 cd VoidSounds
-cp .env.example .env      # заполнить DB_PASSWORD и SESSION_SECRET
+cp .env.example .env      # заменить change_me на свои значения
 
 docker compose up -d postgres
 docker compose --profile migrate run --rm migrate
-docker compose up -d app
+docker compose up -d --build app
 
-curl -s localhost:8080/healthz   
-open http://localhost:8080
+curl -s localhost:8080/healthz   # → OK
 ```
+
+Приложение — на `http://localhost:8080`.
+
+`DB_PASSWORD` и `SESSION_SECRET` обязательны: compose падает с
+`DB_PASSWORD is required`, а приложение — с сообщением о незаданной
+переменной. Дефолтов нет специально, чтобы секреты не уезжали в образ и в git.
 
 Полная остановка с сохранением данных — `docker compose down`,
 сброс базы — `docker compose down -v`.
 
 ## Переменные окружения
+
+Compose читает `.env` из корня репозитория и подставляет значения в сервисы.
 
 | Переменная | По умолчанию | Обязательна | Назначение |
 |---|---|---|---|
@@ -93,40 +106,50 @@ open http://localhost:8080
 | `DB_HOST` | `localhost` | нет | хост PostgreSQL (`postgres` внутри compose) |
 | `DB_PORT` | `5432` | нет | порт PostgreSQL |
 | `DB_USER` | `postgres` | нет | пользователь БД |
-| `DB_PASSWORD` | — | **да** | пароль БД, дефолта нет специально |
+| `DB_PASSWORD` | — | **да** | пароль БД |
 | `DB_NAME` | `voidsounds` | нет | имя базы |
-| `SESSION_SECRET` | — | **да** | ключ подписи cookie, дефолта нет |
+| `SESSION_SECRET` | — | **да** | ключ подписи cookie |
 
 ## Локальная разработка
 
 ```bash
-go run ./cmd/server        # запуск
+go run ./cmd/server        # запуск, .env подхватывается через godotenv
 air                        # hot reload
 templ generate             # если air не подхватил изменения шаблонов
 go run migrations/migrate.go
 go test ./...
 ```
 
+`migrations/migrate.go` прогоняет SQL-файлы из `migrations/` по списку, без
+таблицы версий и без идемпотентности: повторный запуск продублирует сиды.
+
 ## Структура
 
 ```
-cmd/server/          точка входа HTTP-сервера
-cmd/adm/             CLI-утилита администратора
-internal/config/     загрузка и валидация env
-internal/handler/    HTTP-хендлеры
-internal/service/    бизнес-логика
-internal/repository/ доступ к PostgreSQL
-internal/components/ templ-шаблоны
-migrations/          SQL-миграции и сиды
+cmd/server/           точка входа HTTP-сервера
+cmd/adm/              CLI-утилита администратора
+internal/config/      загрузка и валидация env
+internal/domain/      модели предметной области
+internal/handler/     HTTP-хендлеры
+internal/middleware/  сессии и method override
+internal/service/     бизнес-логика
+internal/repository/  доступ к PostgreSQL
+internal/components/  templ-шаблоны
+internal/utils/       вспомогательные функции (slug)
+migrations/           SQL-миграции, сиды и скрипт migrate.go
+docs/img/             скрины для README
 ```
 
 ## Roadmap / известные ограничения
 
 - [ ] миграции через `golang-migrate` (сейчас SQL-файлы прогоняются скриптом и не идемпотентны)
+- [ ] разнести staging и production: разные каталоги, имена compose-проектов и порты
 - [ ] `trivy` и `golangci-lint` как стадии пайплайна
 - [ ] non-root пользователь и `HEALTHCHECK` в образе
 - [ ] healthcheck, возвращающий версию коммита (сейчас отдаёт просто `OK`)
 - [ ] откат на предыдущий тег одной кнопкой
+- [ ] базовые образы закреплены по digest (сейчас `golang:1.25-alpine` и `alpine:latest` плавающие)
 - [ ] Prometheus + Grafana, алерты
 - [ ] reverse proxy с TLS
 - [ ] IaC для VM и Jenkins-агента
+- [ ] Ansible
