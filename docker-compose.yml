@@ -4,7 +4,7 @@ services:
     container_name: voidsounds_postgres
     environment:
       POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-1488}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
       POSTGRES_DB: ${DB_NAME:-voidsounds}
     ports:
       - "${DB_PORT:-5432}:5432"
@@ -29,7 +29,7 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: ${DB_USER:-postgres}
-      DB_PASSWORD: ${DB_PASSWORD:-1488}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
       DB_NAME: ${DB_NAME:-voidsounds}
     depends_on:
       postgres:
@@ -43,7 +43,7 @@ services:
     volumes:
       - ./migrations:/migrations
     environment:
-      PGPASSWORD: ${DB_PASSWORD:-1488}
+      PGPASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
       DB_USER: ${DB_USER:-postgres}
       DB_NAME: ${DB_NAME:-voidsounds}
       DB_HOST: postgres
