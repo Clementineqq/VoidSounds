@@ -1,9 +1,28 @@
+# env-файлы с секретами
 .env
-static/uploads/
-static/uploads/*
-!static/uploads/.gitkeep
-*.log
-logs/
+.env.local
+.env.*.local
+
+# артефакты сборки и бинарники
+*.exe
+*.exe.*
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+bin/
+build/
+dist/
 tmp/
 temp/
 *.tmp
+
+# логи
+*.log
+logs/
+
+# пользовательские загрузки
+static/uploads/
+static/uploads/*
+!static/uploads/.gitkeep
